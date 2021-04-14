@@ -1,0 +1,25 @@
+{
+  "name": "albion_validator",
+  "version": "1.0.0",
+  "description": "node.js web freamework \"albion\" for Validation package..",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nakajima-Satoru/albion_validator.git"
+  },
+  "keywords": [
+    "framework",
+    "web",
+    "mvc",
+    "validation"
+  ],
+  "author": "Nakajima-Satoru",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nakajima-Satoru/albion_validator/issues"
+  },
+  "homepage": "https://github.com/Nakajima-Satoru/albion_validator#readme"
+}
