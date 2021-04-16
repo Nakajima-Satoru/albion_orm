@@ -54,9 +54,15 @@ const OrmSqlBuilder = function(context,topContent){
 
     this.field=function(fields){
 
-        for(var n=0;n<fields.length;n++){
-            _buffer.field.push(fields[n]);
+        if(fields){
+            for(var n=0;n<fields.length;n++){
+                _buffer.field.push(fields[n]);
+            }
         }
+        else{
+            _buffer.field=[];
+        }
+
     };
 
     this.limit=function(limit,offset){
@@ -65,6 +71,9 @@ const OrmSqlBuilder = function(context,topContent){
 
         if(offset){
             _buffer.offset=offset;
+        }
+        else{
+            _buffer.offset=null;
         }
     };
 
@@ -105,7 +114,7 @@ const OrmSqlBuilder = function(context,topContent){
 
             return str;
         },
-        
+
         insert:function(){
 
 

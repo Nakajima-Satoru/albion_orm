@@ -9,6 +9,7 @@ const albionOrm=function(context){
 
     var _connection=null;
     var _baseObj=null;
+    var _selectObj=null;
 
     this.connection=function(params){
         if(params){
@@ -42,13 +43,16 @@ const albionOrm=function(context){
 
     this.select = function(params,callback){
         if(!_baseObj){
-            _baseObj=new OrmSelect(this,context);
+            _baseObj=new ormBase(this);
+        }
+        if(!_selectObj){
+            _selectObj=new OrmSelect(this,context,_baseObj);
         }
         if(params){
-            _baseObj.select(params,callback);
+            _selectObj.select(params,callback);
         }
         else{
-            return _baseObj;
+            return _selectObj;
         }
     };
 
