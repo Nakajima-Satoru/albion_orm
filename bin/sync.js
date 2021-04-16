@@ -1,3 +1,15 @@
+/**
+ * ==================================================
+ * 
+ * ALBION_ORM Ver 1.0.0
+ * 
+ * sync.js
+ * 
+ * CopyLight: Nakajima-Satoru since 0201/04/16
+ * 
+ * ==================================================
+ */
+
 module.exports=function(_syncList){
 
     var syncObject=function(){
@@ -6,11 +18,20 @@ module.exports=function(_syncList){
 
         this._index=0;
 
+        /**
+         * then
+         * @param {*} callback 
+         * @returns 
+         */
         this.then=function(callback){
             this.callbacks.push(callback);
             return this;
         };
 
+        /**
+         * list
+         * @param {*} syncList 
+         */
         this.list=function(syncList){
 
             var o_ = new syncObject();
@@ -21,6 +42,11 @@ module.exports=function(_syncList){
 
         };
 
+        /**
+         * for
+         * @param {*} limit 
+         * @param {*} callbacks 
+         */
         this.for=function(limit,callbacks){
             
             for(var n=0;n<limit;n++){
@@ -30,6 +56,12 @@ module.exports=function(_syncList){
             this.run();
         };
 
+        /**
+         * foreach
+         * @param {*} data 
+         * @param {*} callbacks 
+         * @returns 
+         */
         this.foreach=function(data,callbacks){
 
             if(Array.isArray(data) == true){
@@ -67,6 +99,9 @@ module.exports=function(_syncList){
 
         };
 
+        /**
+         * run
+         */
         this.run=function(){
 
             var cond=this;

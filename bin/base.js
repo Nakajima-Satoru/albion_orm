@@ -1,10 +1,26 @@
-const ormConnection = require("./connection.js");
-const { sync } = require("albion");
+/**
+ * ==================================================
+ * 
+ * ALBION_ORM Ver 1.0.0
+ * 
+ * base.js (OrmBase)
+ * 
+ * CopyLight: Nakajima-Satoru since 0201/04/16
+ * 
+ * ==================================================
+ */
 
-const ormBase = function(context,callback){
+const ormConnection = require("./connection.js");
+const sync = require("./sync.js");
+
+const OrmBase = function(context,callback){
 
     var connection = null;
     
+    /**
+     * check
+     * @returns 
+     */
     this.check=function(){
         if(connection){
             return true;
@@ -14,6 +30,13 @@ const ormBase = function(context,callback){
         }
     };
 
+    /**
+     * query
+     * @param {*} sql 
+     * @param {*} bind 
+     * @param {*} callback 
+     * @param {*} option 
+     */
     this.query=function(sql,bind,callback,option){
 
         if(!option){
@@ -84,4 +107,4 @@ const ormBase = function(context,callback){
 
 };
 
-module.exports=ormBase;
+module.exports=OrmBase;

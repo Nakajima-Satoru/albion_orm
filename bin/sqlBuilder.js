@@ -1,3 +1,15 @@
+/**
+ * ==================================================
+ * 
+ * ALBION_ORM Ver 1.0.0
+ * 
+ * sqlBuilder.js (OrmSqlBuilder)
+ * 
+ * CopyLight: Nakajima-Satoru since 0201/04/16
+ * 
+ * ==================================================
+ */
+
 const OrmSqlBuilder = function(topContent){
 
     var _buffer={
@@ -11,6 +23,14 @@ const OrmSqlBuilder = function(topContent){
 
     var cont=this;
 
+    /**
+     * where
+     * @param {*} field 
+     * @param {*} operand 
+     * @param {*} value 
+     * @param {*} index 
+     * @param {*} logicalOperand 
+     */
     this.where=function(field,operand,value,index,logicalOperand){
 
         if(!logicalOperand){
@@ -29,6 +49,13 @@ const OrmSqlBuilder = function(topContent){
         });
     };
 
+    /**
+     * whereAnd
+     * @param {*} field 
+     * @param {*} operand 
+     * @param {*} value 
+     * @param {*} index 
+     */
     this.whereAnd=function(field,operand,value,index){
 
         _buffer.where.push({
@@ -40,6 +67,13 @@ const OrmSqlBuilder = function(topContent){
         });
     };
 
+    /**
+     * whereOr
+     * @param {*} field 
+     * @param {*} operand 
+     * @param {*} value 
+     * @param {*} index 
+     */
     this.whereOr=function(field,operand,value,index){
 
         _buffer.where.push({
@@ -51,7 +85,10 @@ const OrmSqlBuilder = function(topContent){
         });
     };
 
-
+    /**
+     * field
+     * @param {*} fields 
+     */
     this.field=function(fields){
 
         if(fields){
@@ -65,6 +102,11 @@ const OrmSqlBuilder = function(topContent){
 
     };
 
+    /**
+     * limit
+     * @param {*} limit 
+     * @param {*} offset 
+     */
     this.limit=function(limit,offset){
         
         _buffer.limit=limit;
@@ -77,6 +119,11 @@ const OrmSqlBuilder = function(topContent){
         }
     };
 
+    /**
+     * orderBy
+     * @param {*} field 
+     * @param {*} sort 
+     */
     this.orderBy=function(field,sort){
 
         _buffer.orderBy.push({
@@ -85,16 +132,31 @@ const OrmSqlBuilder = function(topContent){
         });
     };
 
+    /**
+     * groupBy
+     * @param {*} field 
+     */
     this.groupBy=function(field){
         _buffer.groupBy.push(field);
     };
 
+    /**
+     * distinct
+     * @param {*} status 
+     */
     this.distinct=function(status){
         _buffer.distinct=status;
     }
 
+    /**
+     * build
+     */
     this.build={
 
+        /**
+         * select
+         * @returns 
+         */
         select:function(){
 
             var fieldStr=cont.convert.field();
@@ -115,24 +177,58 @@ const OrmSqlBuilder = function(topContent){
             return str;
         },
 
+        /**
+         * insert
+         * @returns 
+         */
         insert:function(){
 
+            var fieldListStr="";
+            var valueListStr="";
 
+            var str="INSERT INTO "+topContent.table+" ( "+fieldListStr+" ) VALUES ("+valueListStr+" )";
+
+            return str;
         },
 
+        /**
+         * update
+         * @returns 
+         */
         update:function(){
 
+            var updateListStr="";
+            var optionStr="";
 
+            var str="UPDATE "+topConten.table+" SET "+updateListStr+optionStr;
+
+            return str;
         },
         
+        /**
+         * delete
+         * @returns 
+         */
         delete:function(){
 
+            var optionStr="";
+
+            var str="DELETE FROM "+topContent.table+optionStr;
+
+            return str;
         },
 
     };
 
+    /**
+     * convert
+     */
     this.convert={
 
+        /**
+         * field
+         * @returns 
+         */
         field:function(){
 
             var str="";
@@ -153,6 +249,10 @@ const OrmSqlBuilder = function(topContent){
 
         },
 
+        /**
+         * where
+         * @returns 
+         */
         where:function(){
 
             if(!_buffer.where.length){
@@ -236,6 +336,10 @@ const OrmSqlBuilder = function(topContent){
             return str;
         },
 
+        /**
+         * limit
+         * @returns 
+         */
         limit:function(){
 
             var str="";
@@ -250,6 +354,10 @@ const OrmSqlBuilder = function(topContent){
             return str;
         },
 
+        /**
+         * orderBy
+         * @returns 
+         */
         orderBy:function(){
 
             if(!_buffer.orderBy.length){
@@ -269,6 +377,11 @@ const OrmSqlBuilder = function(topContent){
 
             return str;
         },
+
+        /**
+         * groupBy
+         * @returns 
+         */
         groupBy:function(){
 
             if(!_buffer.groupBy.length){
@@ -290,6 +403,11 @@ const OrmSqlBuilder = function(topContent){
         },
     };
 
+    /**
+     * _s
+     * @param {*} string 
+     * @returns 
+     */
     this._s=function(string){
 
         if(typeof string!="string"){

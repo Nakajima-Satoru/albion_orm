@@ -1,5 +1,22 @@
+/**
+ * ==================================================
+ * 
+ * ALBION_ORM Ver 1.0.0
+ * 
+ * connection.js (OrmConnection)
+ * 
+ * CopyLight: Nakajima-Satoru since 0201/04/16
+ * 
+ * ==================================================
+ */
+
 const OrmConnection = function(conData,callback){
         
+    /**
+     * _constructor
+     * @param {*} callback 
+     * @returns 
+     */
     this._constructor=function(callback){
 
         if(!conData.type){
@@ -18,6 +35,11 @@ const OrmConnection = function(conData,callback){
     
     };
 
+    /**
+     * connectWithMysql
+     * @param {*} data 
+     * @returns 
+     */
     this.connectWithMysql = function(data){
 
         const mysql = require("mysql");
@@ -67,6 +89,11 @@ const OrmConnection = function(conData,callback){
         return _obj;
     };
 
+    /**
+     * connectWithSqlite3
+     * @param {*} data 
+     * @returns 
+     */
     this.connectWithSqlite3 = function(data){
 
         const sqlite3 = require("sqlite3").verbose();
@@ -82,6 +109,10 @@ const OrmConnection = function(conData,callback){
         return _obj;
     };
 
+    /**
+     * connectWithPgsql
+     * @param {*} data 
+     */
     this.connectWithPgsql = function(data){
 
         // comming soon....!
