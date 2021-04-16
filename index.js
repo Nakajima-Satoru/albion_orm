@@ -1,6 +1,6 @@
 const ormBase = require("./base.js");
 const OrmSelect = require("./select.js");
-const {OrmSave = require("./save.js");
+const OrmSave = require("./save.js");
 const OrmDelete = require("./delete.js");
 const OrmMigration = require("./migration.js");
 const OrmShow = require("./show.js");
@@ -42,7 +42,7 @@ const albionOrm=function(context){
 
     this.select = function(params,callback){
         if(!_baseObj){
-            _baseObj=new OrmSelect(this);
+            _baseObj=new OrmSelect(this,context);
         }
         if(params){
             _baseObj.select(params,callback);
