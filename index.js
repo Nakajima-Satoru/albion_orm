@@ -46,7 +46,7 @@ const albionOrm=function(context){
             _baseObj=new ormBase(this);
         }
         if(!_selectObj){
-            _selectObj=new OrmSelect(this,context,_baseObj);
+            _selectObj=new OrmSelect(context,_baseObj);
         }
         if(params){
             _selectObj.select(params,callback);

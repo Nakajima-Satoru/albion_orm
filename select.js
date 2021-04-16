@@ -1,8 +1,8 @@
 const OrmSqlBuilder = require("./sqlBuilder.js");
 
-const OrmSelect = function(context,topContent,baseObj){
+const OrmSelect = function(topContent,baseObj){
 
-    var sqlBuilder = new OrmSqlBuilder(context,topContent);
+    var sqlBuilder = new OrmSqlBuilder(topContent);
 
     this.select=function(params, callback){
 

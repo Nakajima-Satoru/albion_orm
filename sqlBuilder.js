@@ -1,4 +1,4 @@
-const OrmSqlBuilder = function(context,topContent){
+const OrmSqlBuilder = function(topContent){
 
     var _buffer={
         field:[],
