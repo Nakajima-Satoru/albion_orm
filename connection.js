@@ -1,16 +1,16 @@
-const OrmConnection = function(conData){
+const OrmConnection = function(conData,callback){
         
-    this._constructor=function(){
+    this._constructor=function(callback){
 
         if(!conData.type){
             throw new Error("Specify either \"mysql\" or \"sqlite3\" as the type.");
         }
     
         if(conData.type.toLowerCase()=="mysql"){
-            return this.connectWithMysql(conData);
+            return this.connectWithMysql(conData,callback);
         }
         else if(conData.type.toLowerCase()=="sqlite3"){
-            return this.connectWithSqlite3(conData);
+            return this.connectWithSqlite3(conData,callback);
         }
         else{
             throw new Error("An unsupported SQL Type is specified.(SQL Type that can be specified is \"mysql\", \"sqlite3\".)")
@@ -27,7 +27,7 @@ const OrmConnection = function(conData){
         }
 
         if(!data.port){
-            throw new Error("[CONNECT VALIDATION] The destination port number is not specified in \"port\"");
+            data.port=3306;
         }
 
         if(!data.username){
@@ -45,17 +45,22 @@ const OrmConnection = function(conData){
         var _obj = mysql.createConnection({
             host:data.host,
             port:data.port,
-            user:data.user,
+            user:data.username,
             password:data.password,
             database:data.database,
             encoding:data.encoding,
         });
-        
-     //   try{
-            _obj.connect();
-      //  }catch(error){
-      //      throw new Error(error);
-      //  }
+
+        _obj.connect(function(error){
+            if(error){
+                console.log(error.stack);
+                return;
+            }
+
+            if(callback){
+                callback();
+            }
+        });
 
         _obj.sqlType="mysql";
 
@@ -83,7 +88,7 @@ const OrmConnection = function(conData){
 
     };
 
-    return this._constructor();
+    return this._constructor(callback);
 
 };
 module.exports = OrmConnection;
