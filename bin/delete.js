@@ -186,8 +186,85 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
             }
         }
         else{
+
             option.surrogateOff=true;
-            
+
+            var updateData={
+                [logicalDeleteKey.field]:onValue,
+            };
+
+            saveObj.update(updateData,option,function(error,result){
+                callback(error,result);
+            });
+
+        }
+
+    };
+
+    /**
+     * revert
+     * @param {*} params 
+     * @param {*} option 
+     * @param {*} callback 
+     */
+    this.revert=function(params,option,callback){
+
+        var surrogateKey=topContext.checkSurrogateKey();
+
+        var logicalDeleteKey = topContext.getLogicalDeleteKey();
+
+        if(surrogateKey){
+
+            if(params){
+
+                if(typeof params === "string" || typeof params === "number"){
+                    params=[params];
+                }    
+    
+                var length=params.length;
+
+                var response=[];
+
+                sync().foreach(params,function(next,index,value){
+
+                    var updateData={
+                        [surrogateKey]:params[index],
+                        [logicalDeleteKey.field]:null,
+                    };
+
+                    saveObj.update(updateData,option,function(error,result){
+
+                        if(error){
+                            callback(error);
+                        }
+
+                        response.push(result);
+
+                        if(index < length-1){
+                            next();
+                        }
+                        else{
+                            callback(null,response);
+                        }
+                    });
+
+                });
+
+            }
+
+        }
+        else{
+
+            option.surrogateOff=true;
+
+            var updateData={
+                [logicalDeleteKey.field]:null,
+            };
+
+            saveObj.update(updateData,option,function(error,result){
+                callback(error,result);
+            });
+
         }
 
     };
