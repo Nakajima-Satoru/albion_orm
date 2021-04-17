@@ -179,28 +179,68 @@ const OrmSqlBuilder = function(topContent){
 
         /**
          * insert
+         * @param {*} params 
          * @returns 
          */
-        insert:function(){
+        insert:function(params){
 
             var fieldListStr="";
             var valueListStr="";
 
-            var str="INSERT INTO "+topContent.table+" ( "+fieldListStr+" ) VALUES ("+valueListStr+" )";
+            var colum=Object.keys(params);
+            for(var n=0;n<colum.length;n++){
+                var field=colum[n];
+                var value=params[field];
+
+                if(n!=0){
+                    fieldListStr+=", ";
+                    valueListStr+=", ";
+                }
+                fieldListStr+=field;
+
+                if(value === null){
+                    valueListStr+="NULL";
+                }
+                else{
+                    valueListStr+=cont._s(value);
+                }
+            }
+
+            var str="INSERT INTO "+topContent.table+" ("+fieldListStr+") VALUES ("+valueListStr+")";
 
             return str;
         },
 
         /**
          * update
+         * @param {*} params 
          * @returns 
          */
-        update:function(){
+        update:function(params){
 
             var updateListStr="";
             var optionStr="";
 
-            var str="UPDATE "+topConten.table+" SET "+updateListStr+optionStr;
+            var colum=Object.keys(params);
+            for(var n=0;n<colum.length;n++){
+                var field=colum[n];
+                var value=params[field];
+
+                if(n!=0){
+                    updateListStr+=", ";
+                }
+
+                if(value === null){
+                    updateListStr+=field+" = NULL";
+                }
+                else{
+                    updateListStr+=field+" = "+cont._s(value);
+                }
+            }
+
+            optionStr+=cont.convert.where();
+
+            var str="UPDATE "+topContent.table+" SET "+updateListStr+optionStr;
 
             return str;
         },
@@ -212,6 +252,8 @@ const OrmSqlBuilder = function(topContent){
         delete:function(){
 
             var optionStr="";
+            
+            optionStr+=cont.convert.where();
 
             var str="DELETE FROM "+topContent.table+optionStr;
 
@@ -270,9 +312,7 @@ const OrmSqlBuilder = function(topContent){
                 if(row.index==undefined){
                     row.index=0;
                 }
-
-                console.log(nowIndex+"___"+row.index);
-
+                
                 if(nowIndex > row.index){
                     for(var n2=0;n2<nowIndex-row.index;n2++){
                         str+=" ) ";

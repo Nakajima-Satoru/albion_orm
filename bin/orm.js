@@ -22,7 +22,7 @@ const albionOrm=function(context){
     var _connection=null;
     var _baseObj=null;
     var _selectObj=null;
-    var _showJbo=null;
+    var _showObj=null;
     var _saveObj=null;
 
     /**
@@ -52,6 +52,32 @@ const albionOrm=function(context){
     };
 
     /**
+     * setSurrogateKey
+     * @param {*} field 
+     */
+    this.setSurrogateKey=function(field){
+        context.surrogateKey=field;
+        return this;
+    }
+
+    /**
+     * setTimeStamp
+     * @param {*} params 
+     */
+    this.setTimeStamp=function(params){
+        context.timeStamp=params;
+        return this;
+    }
+
+    /**
+     * getTimeStamp
+     * @returns 
+     */
+    this.getTimeStamp=function(){
+        return context.timeStamp;
+    }
+
+    /**
      * check
      * @returns 
      */
@@ -61,6 +87,14 @@ const albionOrm=function(context){
         }
         return _baseObj.check();
     };
+
+    /**
+     * checkSurrogateKey
+     * @param {*} field 
+     */
+     this.checkSurrogateKey=function(){
+         return context.surrogateKey;
+    }
 
     /**
      * query
@@ -105,31 +139,34 @@ const albionOrm=function(context){
         if(!_baseObj){
             _baseObj=new ormBase(this);
         }
-        if(!_showJbo){
-            _showJbo = new OrmShow(context,_baseObj);
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
         }
-        return _showJbo;
+        return _showObj;
     };
 
     /**
      * save
      * @param {*} params 
-     * @param {*} option 
+     * @param {*} responseStatuis 
      * @param {*} callback 
      * @returns 
      */
-    this.save = function(params,option,callback){
+    this.save = function(params,responseStatuis,callback){
         if(!_baseObj){
             _baseObj=new ormBase(this);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
         }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
         if(!_saveObj){
-            _saveObj=new OrmSave(context,_baseObj,_selectObj);
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
         }
         if(params){
-            _saveObj.auto(params,option,callback);
+            _saveObj.auto(params,responseStatuis,callback);
         }
         else{
             return _saveObj;

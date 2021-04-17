@@ -13,7 +13,7 @@
 const ormConnection = require("./connection.js");
 const sync = require("./sync.js");
 
-const OrmBase = function(context,callback){
+const OrmBase = function(context){
 
     var connection = null;
     
@@ -103,6 +103,17 @@ const OrmBase = function(context,callback){
             },
         ]);
 
+    };
+
+    this.checkSurrogateKey=function(){
+
+        console.log(context);
+        
+        if(!context.surrogateKey){
+            return null;
+        }
+
+        return context.surrogateKey;
     };
 
 };
