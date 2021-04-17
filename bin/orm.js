@@ -22,6 +22,7 @@ const albionOrm=function(context){
     var _connection=null;
     var _baseObj=null;
     var _selectObj=null;
+    var _showJbo=null;
     var _saveObj=null;
 
     /**
@@ -94,6 +95,20 @@ const albionOrm=function(context){
         else{
             return _selectObj;
         }
+    };
+
+    /**
+     * show
+     * @returns 
+     */
+     this.show = function(){
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        if(!_showJbo){
+            _showJbo = new OrmShow(context,_baseObj);
+        }
+        return _showJbo;
     };
 
     /**
@@ -196,15 +211,6 @@ const albionOrm=function(context){
      */
     this.migration = function(){
         var obj = new OrmMigration(this);
-        return obj;
-    };
-
-    /**
-     * show
-     * @returns 
-     */
-    this.show = function(){
-        var obj = new OrmShow(this);
         return obj;
     };
 

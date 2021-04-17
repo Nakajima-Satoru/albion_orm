@@ -9,11 +9,13 @@
  * 
  * ==================================================
  */
+ const OrmSqlBuilder = require("./sqlBuilder.js");
+ 
+const OrmShow = function(topContent){
 
-const OrmShow = function(context){
+    var sqlBuilder = new OrmSqlBuilder(topContent);
 
-
-
+    
 
 };
 module.exports = OrmShow;

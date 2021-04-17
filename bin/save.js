@@ -10,7 +10,11 @@
  * ==================================================
  */
 
-const OrmSave = function(context){
+ const OrmSqlBuilder = require("./sqlBuilder.js");
+ 
+const OrmSave = function(topContent){
+
+    var sqlBuilder = new OrmSqlBuilder(topContent);
 
     /**
      * auto
@@ -23,5 +27,16 @@ const OrmSave = function(context){
 
     };
 
+    /**
+     * insert
+     * @param {*} params 
+     * @param {*} option 
+     * @param {*} callback 
+     */
+    this.insert=function(params,option,callback){
+
+
+
+    };
 };
 module.exports = OrmSave;
