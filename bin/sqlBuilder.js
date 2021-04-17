@@ -459,5 +459,16 @@ const OrmSqlBuilder = function(topContent){
         return "\""+string+"\"";
     };
 
+    this.clearBuffer=function(){
+        _buffer={
+            field:[],
+            where:[],
+            limit:null,
+            offset:null,
+            orderBy:[],
+            groupBy:[],            
+        };
+    }
+
 };
 module.exports = OrmSqlBuilder;

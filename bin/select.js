@@ -131,6 +131,8 @@ const OrmSelect = function(topContent,baseObj){
 
         var sql = sqlBuilder.build.select();
 
+        sqlBuilder.clearBuffer();
+        
         baseObj.query(sql,null,function(error,result){
 
             if(topContent.selectAfter){

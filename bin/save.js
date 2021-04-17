@@ -108,6 +108,8 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
 
         var sql=sqlBuilder.build.insert(params);
         
+        sqlBuilder.clearBuffer();
+
         var response={};
 
         sync([
@@ -149,7 +151,11 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
      * @returns 
      */
     this.getInsertSql=function(params){
-        return sqlBuilder.build.insert(params);
+        var str = sqlBuilder.build.insert(params);
+
+        sqlBuilder.clearBuffer();
+
+        return str;
     }
 
     /**
@@ -184,24 +190,25 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
         if(!surrogateOff){
             if(surrogateKey){
                 this.where(surrogateKey,"=",params[surrogateKey]);
+                var _sid = params[surrogateKey];
+                delete params[surrogateKey];
             }    
         }
 
         var sql=sqlBuilder.build.update(params);
 
-        var response={};
+        sqlBuilder.clearBuffer();
 
         sync([
             function(next){
                 baseObj.query(sql,null,function(error,result){
-                    
+
                     if(error){
                         callback(error,null);
                         return;
                     }
 
-                    if(responseStatus && surrogateKey){
-                        response=result;
+                    if(responseStatus && surrogateKey && !surrogateOff){
                         next();
                     }
                     else{
@@ -211,7 +218,7 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
             },
             function(){
                 selectObj
-                    .where(surrogateKey,"=",params[surrogateKey])
+                    .where(surrogateKey,"=",_sid)
                     .first(function(error,result){
                         callback(error,result);
                     });
@@ -246,10 +253,15 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
         if(!surrogateOff){
             if(surrogateKey){
                 this.where(surrogateKey,"=",params[surrogateKey]);
+                delete params[surrogateKey];
             }    
         }
 
-        return sqlBuilder.build.update(params);
+        var sql=sqlBuilder.build.update(params);
+
+        sqlBuilder.clearBuffer();
+        
+        return sql;
     }
 
 };

@@ -16,6 +16,7 @@ const OrmSave = require("./save.js");
 const OrmDelete = require("./delete.js");
 const OrmMigration = require("./migration.js");
 const OrmShow = require("./show.js");
+const Ormtransaction = require("./transaction.js");
 
 const albionOrm=function(context){
 
@@ -24,6 +25,7 @@ const albionOrm=function(context){
     var _selectObj=null;
     var _showObj=null;
     var _saveObj=null;
+    var _deleteObj=null;
 
     /**
      * connection
@@ -76,6 +78,24 @@ const albionOrm=function(context){
     this.getTimeStamp=function(){
         return context.timeStamp;
     }
+
+    /**
+     * setLogicalDeleteKey
+     * @param {*} params 
+     * @returns 
+     */
+    this.setLogicalDeleteKey=function(params){
+        context.logicalDeleteKey=params;
+        return this;
+    };
+
+    /**
+     * getLogicalDeleteKey
+     * @returns 
+     */
+    this.getLogicalDeleteKey=function(){
+        return context.logicalDeleteKey;
+    };
 
     /**
      * check
@@ -187,10 +207,12 @@ const albionOrm=function(context){
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
         }
-        if(!_saveObj){
-            _saveObj=new OrmSave(context,_baseObj,_selectObj);
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
         }
-
+        if(!_saveObj){
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
+        }
         if(params){
             _saveObj.insert(params,option,callback);
         }
@@ -213,8 +235,11 @@ const albionOrm=function(context){
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
         }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
         if(!_saveObj){
-            _saveObj=new OrmSave(context,_baseObj,_selectObj);
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
         }
 
         if(params){
@@ -228,18 +253,31 @@ const albionOrm=function(context){
     /**
      * delete
      * @param {*} params 
+     * @param {*} option 
      * @param {*} callback 
      * @returns 
      */
-    this.delete = function(params,callback){
+    this.delete = function(params,option,callback){
         if(!_baseObj){
-            _baseObj=new OrmDelete(this);
+            _baseObj=new ormBase(this);
+        }
+        if(!_selectObj){
+            _selectObj=new OrmSelect(context,_baseObj);
+        }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
+        if(!_saveObj){
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
+        }
+        if(!_deleteObj){
+            _deleteObj=new OrmDelete(context,_baseObj,_selectObj,_saveObj);
         }
         if(params){
-            _baseObj.delete(params,option,callback);
+            _deleteObj.delete(params,option,callback);
         }
         else{
-            return _baseObj;
+            return _deleteObj;
         }
     };
 
@@ -249,6 +287,22 @@ const albionOrm=function(context){
     this.migration = function(){
         var obj = new OrmMigration(this);
         return obj;
+    };
+
+    /**
+     * transaction
+     * @param {*} callback 
+     * @param {*} errCallback 
+     * @returns 
+     */
+    this.transaction=function(callback,errCallback){
+        var obj=new Ormtransaction(context);
+        if(callback){
+
+        }
+        else{
+            return obj;
+        }
     };
 
 };
