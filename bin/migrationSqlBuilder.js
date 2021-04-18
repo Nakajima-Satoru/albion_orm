@@ -10,8 +10,6 @@ const OrmMMigrationSqlBuilder = function(buildData){
     
             var row=buildData[n];
     
-            console.log(row);
-
             var res="";
 
             if(row.type=="comment"){
@@ -19,11 +17,26 @@ const OrmMMigrationSqlBuilder = function(buildData){
             }else if(row.type=="createDatabase"){
                 res=this.createDatabase(row);
             }
+            else if(row.type=="changeDatabase"){
+                res=this.changeDatabase(row);
+            }
             else if(row.type=="createTable"){
                 res=this.createTable(row);
             }
             else if(row.type=="createView"){
                 res=this.createView(row);
+            }
+            else if(row.type=="alterTable"){
+                res=this.alterTable(row);
+            }
+            else if(row.type=="dropTable"){
+                res=this.dropTable(row);
+            }
+            else if(row.type=="dropView"){
+                res=this.dropView(row);
+            }
+            else if(row.type=="insert"){
+                res=this.insert(row);
             }
     
             response.push(res);
@@ -62,6 +75,11 @@ const OrmMMigrationSqlBuilder = function(buildData){
         return str;
     };
 
+    this.changeDatabase=function(data){
+        var str="USE "+data.databaseName;
+        return str;
+    };
+
     this.createTable=function(data){
 
         var str="CREATE TABLE ";
@@ -97,7 +115,7 @@ const OrmMMigrationSqlBuilder = function(buildData){
                     fopt.type="INT";
                 }
 
-                if(fopt.type=="INT" || fopt.type=="VARCHAR"){
+                if(fopt.type=="INT" || fopt.type=="VARCHAR" || fopt.type=="TINYINT"){
                     fieldStr+=fopt.type+"("+fopt.length+") ";
                 }
                 else{
@@ -133,6 +151,9 @@ const OrmMMigrationSqlBuilder = function(buildData){
 
             str+=") ";
         }
+        else{
+            str+=" (\n)";
+        }
 
         if(data.option.engine){
             str+="ENGINE = "+data.option.engine;
@@ -159,10 +180,6 @@ const OrmMMigrationSqlBuilder = function(buildData){
 
         var str="CREATE VIEW ";
 
-        if(data.option.ifNotExists){
-            str+="IF NOT EXISTS ";
-        }
-
         str+=data.viewName;
 
         if(data.option.sql){
@@ -172,7 +189,64 @@ const OrmMMigrationSqlBuilder = function(buildData){
         return str;
     };
 
+    /**
+     * alterTable
+     * @param {*} data 
+     * @returns 
+     */
+    this.alterTable=function(data){
+        var str="";
+
+        return str;
+    };
+
+    /**
+     * dropTable
+     * @param {*} data 
+     * @returns 
+     */
+    this.dropTable=function(data){
+        var str="DROP TABLE ";
+
+        if(data.option.ifExists){
+            str+="IF EXISTS ";
+        }
+
+        str+=data.tableName;
+
+        return str;
+    };
+
+    /**
+     * dropView
+     * @param {*} data 
+     * @returns 
+     */
+    this.dropView=function(data){
+        var str="";
+
+        var str="DROP VIEW ";
+
+        if(data.option.ifExists){
+            str+="IF EXISTS ";
+        }
+
+        str+=data.viewName;
+
+        return str;
+    };
+
+    /**
+     * insert
+     * @param {*} data 
+     * @returns 
+     */
+    this.insert=function(data){
+        var str="";
+
+        return str;
+    };
+
     return this.run();
 };
 module.exports = OrmMMigrationSqlBuilder;
-

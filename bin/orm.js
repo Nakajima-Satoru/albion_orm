@@ -285,7 +285,10 @@ const albionOrm=function(context){
      * migration
      */
     this.migration = function(){
-        var obj = new OrmMigration(this);
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        var obj = new OrmMigration(_baseObj);
         return obj;
     };
 

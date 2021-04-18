@@ -11,11 +11,11 @@
  */
 
 const OrmMMigrationSqlBuilder = require("./migrationSqlBuilder.js");
+const sync = require("./sync.js");
 
-const OrmMigration = function(context){
+const OrmMigration = function(baseObj){
 
     var _buffer=[];
-
 
     /**
      * comment
@@ -37,10 +37,28 @@ const OrmMigration = function(context){
      * @returns 
      */
     this.createDatabase=function(databaseName,option){
+
+        if(!option){
+            option={};
+        }
+
         _buffer.push({
             type:"createDatabase",
             databaseName:databaseName,
             option:option,
+        });
+        return this;
+    };
+
+    /**
+     * changeDatabase
+     * @param {*} databaseName 
+     * @returns 
+     */
+    this.changeDatabase=function(databaseName){
+        _buffer.push({
+            type:"changeDatabase",
+            databaseName:databaseName,
         });
         return this;
     };
@@ -52,6 +70,11 @@ const OrmMigration = function(context){
      * @returns 
      */
     this.createTable=function(tableName,option){
+
+        if(!option){
+            option={};
+        }
+
         _buffer.push({
             type:"createTable",
             tableName:tableName,
@@ -67,6 +90,11 @@ const OrmMigration = function(context){
      * @returns 
      */
     this.createView=function(viewName,option){
+
+        if(!option){
+            option={};
+        }
+
         _buffer.push({
             type:"createView",
             viewName:viewName,
@@ -82,6 +110,11 @@ const OrmMigration = function(context){
      * @returns 
      */
     this.alterTable=function(tableName,option){
+
+        if(!option){
+            option={};
+        }
+
         _buffer.push({
             type:"alterTable",
             tableName:tableName,
@@ -91,14 +124,41 @@ const OrmMigration = function(context){
     };
 
     /**
-     * dropTable
-     * @param {*} tableName 
+     * tropDatabase
+     * @param {*} databaseName 
+     * @param {*} option 
      * @returns 
      */
-    this.dropTable=function(tableName){
+    this.tropDatabase=function(databaseName,option){
+
+        if(!option){
+            option={};
+        }
+
+        _buffer.push({
+            type:"tropDatabase",
+            databaseName:databaseName,
+            option:option,
+        });
+        return this;
+    };
+
+    /**
+     * dropTable
+     * @param {*} tableName 
+     * @param {*} option 
+     * @returns 
+     */
+    this.dropTable=function(tableName,option){
+
+        if(!option){
+            option={};
+        }
+
         _buffer.push({
             type:"dropTable",
             tableName:tableName,
+            option:option,
         });
         return this;
     };
@@ -106,12 +166,19 @@ const OrmMigration = function(context){
     /**
      * dropView
      * @param {*} viewName 
+     * @param {*} option 
      * @returns 
      */
-    this.dropView=function(viewName){
+    this.dropView=function(viewName,option){
+
+        if(!option){
+            option={};
+        }
+
         _buffer.push({
             type:"dropView",
             viewName:viewName,
+            option:option,
         });
         return this;
     };
@@ -133,11 +200,6 @@ const OrmMigration = function(context){
 
     /**
      * sqls
-     * @returns 
-     */
-
-    /**
-     * sqls
      * @param {*} stringOutputed 
      * @returns 
      */
@@ -152,10 +214,31 @@ const OrmMigration = function(context){
         return sqls;
     };
 
-    this.query=function(){
+    /**
+     * query
+     * @param {*} callback 
+     */
+    this.query=function(callback){
 
-        var sql = this.sql();
+        var sqls = this.sqls();
 
+        sync().foreach(sqls,function(next,index,value){
+
+            baseObj.query(value,null,function(error,result){
+                if(error){
+                    callback(error);                    
+                    return;
+                }
+
+                if(index<sqls.length-1){
+                    next();
+                }
+                else{
+                    callback();
+                }
+            });
+
+        });
 
     };
 
