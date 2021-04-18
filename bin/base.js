@@ -121,6 +121,10 @@ const OrmBase = function(context){
 
     };
 
+    /**
+     * checkSurrogateKey
+     * @returns 
+     */
     this.checkSurrogateKey=function(){
         
         if(!context.surrogateKey){
@@ -130,10 +134,18 @@ const OrmBase = function(context){
         return context.surrogateKey;
     };
 
+    /**
+     * getSqlType
+     * @returns 
+     */
     this.getSqlType=function(){
         return context.connection().type;
     };
 
+    /**
+     * getLog
+     * @returns 
+     */
     this.getLog=function(){
         return log;
     }
