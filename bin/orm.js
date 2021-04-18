@@ -98,6 +98,18 @@ const albionOrm=function(context){
     };
 
     /**
+     * getLog
+     * @returns 
+     */
+    this.getLog=function(){
+        if(_baseObj){
+            return _baseObj.getLog();
+        }
+
+        return null;
+    };
+
+    /**
      * check
      * @returns 
      */

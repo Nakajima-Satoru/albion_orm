@@ -16,6 +16,8 @@ const sync = require("./sync.js");
 const OrmBase = function(context){
 
     var connection = null;
+
+    var log=[];
     
     /**
      * check
@@ -65,6 +67,11 @@ const OrmBase = function(context){
         
             },
             function(){
+
+                log.push({
+                    sql:sql,
+                    bind:bind,
+                });
 
                 if(connection.sqlType=="mysql"){
 
@@ -127,6 +134,9 @@ const OrmBase = function(context){
         return context.connection().type;
     };
 
+    this.getLog=function(){
+        return log;
+    }
 };
 
 module.exports=OrmBase;
