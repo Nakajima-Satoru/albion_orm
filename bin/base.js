@@ -50,14 +50,22 @@ const OrmBase = function(context){
                     next();
                     return;
                 }
+
+                var sqlType=context.connection().type;
         
-                connection = new ormConnection(context.connection(),function(){
-                    next();
-                });    
+                connection = new ormConnection(context.connection(),function(obj){
+                    if(sqlType=="mysql"){
+                        next();
+                    }
+                    else if(sqlType=="sqlite3"){
+                        connection=obj;
+                        next();
+                    }
+               });
         
             },
             function(){
-        
+
                 if(connection.sqlType=="mysql"){
 
                     connection.query(sql,bind,function(error,results){
@@ -96,6 +104,7 @@ const OrmBase = function(context){
                         }
                         else{
                             connection.run(sql);
+                            callback(null,null);
                         }            
                     });
                 }
@@ -106,14 +115,16 @@ const OrmBase = function(context){
     };
 
     this.checkSurrogateKey=function(){
-
-        console.log(context);
         
         if(!context.surrogateKey){
             return null;
         }
 
         return context.surrogateKey;
+    };
+
+    this.getSqlType=function(){
+        return context.connection().type;
     };
 
 };

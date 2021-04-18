@@ -205,7 +205,9 @@ const OrmMigration = function(baseObj){
      */
     this.sqls=function(stringOutputed){
 
-        var sqls = new OrmMMigrationSqlBuilder(_buffer);
+        var sqlType=baseObj.getSqlType();
+
+        var sqls = new OrmMMigrationSqlBuilder(sqlType,_buffer);
 
         if(stringOutputed){
             sqls=sqls.join(";\n\n");
@@ -226,7 +228,7 @@ const OrmMigration = function(baseObj){
 
             baseObj.query(value,null,function(error,result){
                 if(error){
-                    callback(error);                    
+                    callback(error,false);                    
                     return;
                 }
 
@@ -234,7 +236,7 @@ const OrmMigration = function(baseObj){
                     next();
                 }
                 else{
-                    callback();
+                    callback(null,true);
                 }
             });
 

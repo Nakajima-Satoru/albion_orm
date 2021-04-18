@@ -106,6 +106,8 @@ const OrmConnection = function(conData,callback){
 
         _obj.sqlType="sqlite3";
 
+        callback(_obj);
+        
         return _obj;
     };
 

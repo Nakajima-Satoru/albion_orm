@@ -1,4 +1,4 @@
-const OrmMMigrationSqlBuilder = function(buildData){
+const OrmMMigrationSqlBuilder = function(sqlType,buildData){
 
     var defaultOption={};
 
@@ -39,18 +39,28 @@ const OrmMMigrationSqlBuilder = function(buildData){
                 res=this.insert(row);
             }
     
-            response.push(res);
+            if(res){
+                response.push(res);
+            }
         }
     
         return response;
     };
 
     this.comment=function(data){
+        if(sqlType=="sqlite3"){
+            return "";
+        }
+
         var str="/* "+data.text+" */";
         return str;
     };
 
     this.createDatabase=function(data){
+
+        if(sqlType=="sqlite3"){
+            return "";
+        }
 
         var str="CREATE DATABASE ";
 
@@ -76,6 +86,11 @@ const OrmMMigrationSqlBuilder = function(buildData){
     };
 
     this.changeDatabase=function(data){
+
+        if(sqlType=="sqlite3"){
+            return "";
+        }
+
         var str="USE "+data.databaseName;
         return str;
     };
@@ -112,11 +127,19 @@ const OrmMMigrationSqlBuilder = function(buildData){
                 fopt.type=fopt.type.toUpperCase();
 
                 if(fopt.type=="INTEGER"){
-                    fopt.type="INT";
+                    if(sqlType=="mysql"){
+                        fopt.type="INT";
+                    }
                 }
 
+
                 if(fopt.type=="INT" || fopt.type=="VARCHAR" || fopt.type=="TINYINT"){
-                    fieldStr+=fopt.type+"("+fopt.length+") ";
+                    if(sqlType=="mysql"){
+                        fieldStr+=fopt.type+"("+fopt.length+") ";
+                    }
+                    else if(sqlType=="sqlite3"){
+                        fieldStr+=fopt.type+" ";
+                    }
                 }
                 else{
                     fieldStr+=fopt.type+" ";
@@ -127,7 +150,9 @@ const OrmMMigrationSqlBuilder = function(buildData){
                 }
 
                 if(fopt.autoIncrement){
-                    fieldStr+="AUTO_INCREMENT ";
+                    if(sqlType=="mysql"){
+                        fieldStr+="AUTO_INCREMENT ";
+                    }
                 }
 
                 if(fopt.primaryKey){
@@ -139,7 +164,9 @@ const OrmMMigrationSqlBuilder = function(buildData){
                 }
 
                 if(fopt.comment){
-                    fieldStr+="COMMENT '"+fopt.comment+"' ";
+                    if(sqlType=="mysql"){
+                        fieldStr+="COMMENT '"+fopt.comment+"' ";
+                    }
                 }
 
                 str+=fieldStr;
@@ -156,16 +183,24 @@ const OrmMMigrationSqlBuilder = function(buildData){
         }
 
         if(data.option.engine){
-            str+="ENGINE = "+data.option.engine;
+            if(sqlType=="mysql"){
+                str+="ENGINE = "+data.option.engine;
+            }
         }
         if(data.option.autoIncrement){
-            str+="AUTO_INCREMENT = "+data.option.autoIncrement;
+            if(sqlType=="mysql"){
+                str+="AUTO_INCREMENT = "+data.option.autoIncrement;
+            }
         }
         if(data.option.defaultCharset){
-            str+="DEFAULT CHARSET = "+data.option.defaultCharset;
+            if(sqlType=="mysql"){
+                str+="DEFAULT CHARSET = "+data.option.defaultCharset;
+            }
         }
         if(data.option.comment){
-            str+="COMMENT = '"+data.option.comment+"'";
+            if(sqlType=="mysql"){
+                str+="COMMENT = '"+data.option.comment+"'";
+            }
         }
 
         return str;
@@ -242,10 +277,45 @@ const OrmMMigrationSqlBuilder = function(buildData){
      * @returns 
      */
     this.insert=function(data){
-        var str="";
+
+        var fieldList="";
+        var valueList="";
+
+        var colum=Object.keys(data.data);
+        for(var n=0;n<colum.length;n++){
+            var field=colum[n];
+            var value=data.data[field];
+
+            if(n!=0){
+                fieldList+=", ";
+                valueList+=", ";
+            }
+
+            fieldList+=field;
+            valueList+=this._s(value);            
+        }
+
+        var str="INSERT INTO "+data.tableName+"("+fieldList+") VALUES ("+valueList+")";
 
         return str;
     };
+
+    /**
+     * _s
+     * @param {*} string 
+     * @returns 
+     */
+     this._s=function(string){
+
+        if(typeof string!="string"){
+            return string;
+        }
+
+        string=string.split("\"").join("\\\"");
+
+        return "\""+string+"\"";
+    };
+
 
     return this.run();
 };
