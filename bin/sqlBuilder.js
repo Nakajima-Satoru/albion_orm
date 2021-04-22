@@ -33,6 +33,17 @@ const OrmSqlBuilder = function(topContent){
      */
     this.where=function(field,operand,value,index,logicalOperand){
 
+        if(
+            !field && 
+            !operand && 
+            !value &&
+            !index &&
+            !logicalOperand
+        ){
+            _buffer.where=[];
+            return;
+        }
+
         if(!logicalOperand){
             logicalOperand="AND";
         }
