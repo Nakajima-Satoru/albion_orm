@@ -45,6 +45,8 @@ const OrmBase = function(context){
             option={};
         }
 
+        var _res={};
+        
         sync([
             function(next){
 
@@ -66,7 +68,7 @@ const OrmBase = function(context){
                });
         
             },
-            function(){
+            function(next){
 
                 log.push({
                     sql:sql,
@@ -75,8 +77,14 @@ const OrmBase = function(context){
 
                 if(connection.sqlType=="mysql"){
 
-                    connection.query(sql,bind,function(error,results){
-                        callback(error,results);
+                    connection.query(sql,bind,function(error,result){
+
+                        _res={
+                            error:error,
+                            result:result,
+                        };
+
+                        next();
                     });
         
                 }
@@ -96,26 +104,61 @@ const OrmBase = function(context){
         
                         if(methodType=="all"){
                             connection.all(sql,function(error,result){
-                                callback(error,result);
+                                _res={
+                                    error:error,
+                                    result:result,
+                                };
+
+                                next();
                             });
                         }
                         else if(methodType=="get"){
                             connection.get(sql,function(error,result){
-                                callback(error,result);
+                                _res={
+                                    error:error,
+                                    result:result,
+                                };
+        
+                                next();
                             });
                         }
                         else if(methodType=="each"){
                             connection.each (sql,function(error,result){
-                                callback(error,result);
+                                _res={
+                                    error:error,
+                                    result:result,
+                                };
+        
+                                next();
                             });
                         }
                         else{
                             connection.run(sql);
-                            callback(null,null);
+                            _res={
+                                error:null,
+                                result:true,
+                            };
+    
+                            next();
                         }            
                     });
                 }
         
+            },
+            function(){
+                     
+                var response = new OrmQueryResponse();
+
+                if(_res.error){
+                    response.status=false;
+                    response.error=_res.error;
+                }
+                else{
+                    response.status=true;
+                    response.result=_res.result;
+                }
+
+                callback(response);
             },
         ]);
 
@@ -149,6 +192,12 @@ const OrmBase = function(context){
     this.getLog=function(){
         return log;
     }
+};
+
+const OrmQueryResponse=function(){
+
+    this.status=true;
+
 };
 
 module.exports=OrmBase;

@@ -124,8 +124,8 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
 
         sqlBuilder.clearBuffer();
 
-        baseObj.query(sql,null,function(error,result){
-            callback(error,result);
+        baseObj.query(sql,null,function(res){
+            callback(res);
         });
 
     };
@@ -165,19 +165,20 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
                         [logicalDeleteKey.field]:onValue,
                     };
 
-                    saveObj.update(updateData,option,function(error,result){
+                    saveObj.update(updateData,option,function(res){
 
-                        if(error){
-                            callback(error);
+                        if(!res.status){
+                            return callback(res);
                         }
 
-                        response.push(result);
-
+                        response.push(res.result);
+s
                         if(index < length-1){
                             next();
                         }
                         else{
-                            callback(null,response);
+                            res.result=response;
+                            callback(res);
                         }
                     });
 
@@ -193,8 +194,8 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
                 [logicalDeleteKey.field]:onValue,
             };
 
-            saveObj.update(updateData,option,function(error,result){
-                callback(error,result);
+            saveObj.update(updateData,option,function(res){
+                callback(res);
             });
 
         }
@@ -232,19 +233,20 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
                         [logicalDeleteKey.field]:null,
                     };
 
-                    saveObj.update(updateData,option,function(error,result){
+                    saveObj.update(updateData,option,function(res){
 
-                        if(error){
-                            callback(error);
+                        if(!res.status){
+                            return callback(res);
                         }
 
-                        response.push(result);
+                        response.push(res.result);
 
                         if(index < length-1){
                             next();
                         }
                         else{
-                            callback(null,response);
+                            res.result=response;
+                            callback(res);
                         }
                     });
 
@@ -261,8 +263,8 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
                 [logicalDeleteKey.field]:null,
             };
 
-            saveObj.update(updateData,option,function(error,result){
-                callback(error,result);
+            saveObj.update(updateData,option,function(res){
+                callback(res);
             });
 
         }

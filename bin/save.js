@@ -114,19 +114,18 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
 
         sync([
             function(next){
-                baseObj.query(sql,null,function(error,result){
+                baseObj.query(sql,null,function(res){
                     
-                    if(error){
-                        callback(error,null);
-                        return;
+                    if(!res.status){
+                        return callback(res);
                     }
 
                     if(responseStatus && surrogateKey){
-                        response=result;
+                        response=res.result;
                         next();
                     }
                     else{
-                        callback(null,result);
+                        callback(res);
                     }
                 });
             },
@@ -134,8 +133,8 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
 
                 selectObj
                     .where(surrogateKey,"=",response.insertId)
-                    .first(function(error,result){
-                        callback(error,result);
+                    .first(function(res){
+                        callback(res);
                     });
                 ;
 
@@ -201,28 +200,29 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
 
         sync([
             function(next){
-                baseObj.query(sql,null,function(error,result){
+                baseObj.query(sql,null,function(res){
 
-                    if(error){
-                        callback(error,null);
-                        return;
+                    if(!res.status){
+                        return callback(res);
                     }
 
                     if(responseStatus && surrogateKey && !surrogateOff){
                         next();
                     }
                     else{
-                        callback(null,result);
+                        callback(res);
                     }
                 });
             },
             function(){
+
                 selectObj
                     .where(surrogateKey,"=",_sid)
-                    .first(function(error,result){
-                        callback(error,result);
+                    .first(function(res){
+                        callback(res);
                     });
                 ;
+
             },
         ]);        
 

@@ -224,19 +224,24 @@ const OrmMigration = function(baseObj){
 
         var sqls = this.sqls();
 
+        var response = [];
+
         sync().foreach(sqls,function(next,index,value){
 
-            baseObj.query(value,null,function(error,result){
-                if(error){
-                    callback(error,false);                    
-                    return;
+            baseObj.query(value,null,function(res){
+
+                if(!res.status){
+                    return callback(res);                    
                 }
+
+                response.push(res.result);
 
                 if(index<sqls.length-1){
                     next();
                 }
                 else{
-                    callback(null,true);
+                    res.result=response;
+                    callback(res);
                 }
             });
 

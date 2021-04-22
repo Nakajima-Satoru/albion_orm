@@ -12,6 +12,7 @@
 
 const OrmSqlBuilder = require("./sqlBuilder.js");
 const OrmSelectResponse = require("./selectResponse.js");
+const sync = require("./sync.js");
 
 const OrmSelect = function(topContent,baseObj){
 
@@ -133,16 +134,16 @@ const OrmSelect = function(topContent,baseObj){
 
         sqlBuilder.clearBuffer();
         
-        baseObj.query(sql,null,function(error,result){
+        baseObj.query(sql,null,function(res){
 
             if(topContent.selectAfter){
-                var buffer=topContent.selectAfter(error,result);
+                var buffer=topContent.selectAfter(res);
                 if(buffer){
                     result=buffer;
                 }
             }
             
-            callback(error,result);
+            callback(res);
         });
     };
 
@@ -151,13 +152,12 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.first=function(callback){
-        this.limit(1).all(function(error,result){
-            if(error){
-                callback(error,null);
+        this.limit(1).all(function(res){
+
+            if(res.status){
+                res.result=res.result[0];
             }
-            else{
-                callback(null,result[0]);
-            }
+            callback(res);
         });
     };
 
@@ -172,13 +172,13 @@ const OrmSelect = function(topContent,baseObj){
         if(!option.noResetField){
             this.field().field([field]);
         }
-        this.all(function(error,result){
-            if(error){
-                callback(error,null);
+        this.all(function(res){
+
+            if(res.status){
+                res.result=res.result[0][field];
             }
-            else{
-                callback(null,result[0][field]);
-            }
+
+            callback(res);
         });
     };
 
@@ -188,7 +188,12 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.min=function(field,callback){
-        this.field().field(["MIN("+field+") AS "+field]).value(field,callback,{noResetField:true});
+        this
+            .field()
+            .field(["MIN("+field+") AS "+field])
+            .value(field,callback,{
+                noResetField:true,
+            });
     };
 
     /**
@@ -197,7 +202,12 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.max=function(field,callback){
-        this.field().field(["MAX("+field+") AS "+field]).value(field,callback,{noResetField:true});
+        this
+            .field()
+            .field(["MAX("+field+") AS "+field])
+            .value(field,callback,{
+                noResetField:true,
+            });
     };
 
     /**
@@ -206,7 +216,12 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.avg=function(field,callback){
-        this.field().field(["AVG("+field+") AS "+field]).value(field,callback,{noResetField:true});
+        this
+            .field()
+            .field(["AVG("+field+") AS "+field])
+            .value(field,callback,{
+                noResetField:true,
+            });
     };
 
     /**
@@ -215,7 +230,12 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.sum=function(field,callback){
-        this.field().field(["SUM("+field+") AS "+field]).value(field,callback,{noResetField:true});
+        this
+            .field()
+            .field(["SUM("+field+") AS "+field])
+            .value(field,callback,{
+                noResetField:true,
+            });
     };
 
     /**
@@ -234,27 +254,28 @@ const OrmSelect = function(topContent,baseObj){
             this.field().field([field[0],field[1]]);
         }
 
-        this.all(function(error,result){
-            if(error){
-                callback(error,null);
+        this.all(function(res){
+
+            if(!res.status){
+                return callback(res);
             }
-            else{
 
-                for(var n=0;n<result.length;n++){
+            for(var n=0;n<result.length;n++){
 
-                    var row=result[n];
+                var row=result[n];
 
-                    if(typeof field=="string"){
-                        list.push(row[field]);
-                    }
-                    else{
-                        list[row[field[0]]]=row[field[1]];
-                    }
-    
+                if(typeof field=="string"){
+                    list.push(row[field]);
                 }
-
-                callback(null,list);
+                else{
+                    list[row[field[0]]]=row[field[1]];
+                }
+    
             }
+
+            res.result=list;
+
+            callback(res);
         });
 
     };
@@ -264,14 +285,78 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.count=function(callback){
-        this.field().field(["count(*) as count"]).all(function(error,result){
-            if(error){
-                callback(error,null);
-            }
-            else{
-                callback(null,result[0]);
-            }
-        });
+        this
+            .field()
+            .field(["count(*) as count"])
+            .all(function(res){
+
+                if(res.status){
+                    res.result=res.result[0].count;
+                }
+
+                callback(res);
+            });
+    };
+
+    /**
+     * paginate
+     * @param {*} limit 
+     * @param {*} page 
+     * @param {*} callback 
+     */
+    this.paginate=function(limit,page,callback){
+
+        if(!page){
+            page=1;
+        }
+
+        var offset=(page-1)*limit;
+
+        var totalCount=0;
+
+        var cont=this;
+
+        sync([
+            function(next){
+
+                cont
+                    .limit(limit,offset)
+                    .count(function(res){
+
+                        if(!res.status){
+                            return callback(res);
+                        }
+
+                        totalCount=res.result;
+
+                        next();
+                    });
+
+            },
+            function(next){
+
+                cont
+                    .limit(limit,offset)
+                    .all(function(res){
+        
+                        if(!res.status){
+                            return callback(res);
+                        }
+        
+                        var totalPage=Math.ceil(totalCount/limit);
+
+                        res.paginate={
+                            totalcount:totalCount,
+                            totalPage:totalPage,
+                            page:page,
+                            limit:limit,
+                        };
+
+                        callback(res);        
+                    });
+            },
+        ]);
+
     };
 
     /**
