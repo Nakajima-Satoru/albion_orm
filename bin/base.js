@@ -90,6 +90,19 @@ const OrmBase = function(context){
                 }
                 else if(connection.sqlType=="sqlite3"){
         
+                    if(bind){
+                        var colum=Object.keys(bind);
+                        for(var n=0;n<colum.length;n++){
+                            var field=colum[n];
+                            var value=bind[field];
+
+                            value=cont._s(value);
+
+                            sql=sql.split(field).join(value);
+                        }
+                    }
+
+
                     connection.serialize(() => {
         
                         var sqlLower = sql.toLowerCase();
@@ -192,6 +205,23 @@ const OrmBase = function(context){
     this.getLog=function(){
         return log;
     }
+
+
+    /**
+     * _s
+     * @param {*} string 
+     * @returns 
+     */
+    this._s=function(string){
+
+       if(typeof string!="string"){
+           return string;
+       }
+
+       string=string.split("\"").join("\\\"");
+
+       return "\""+string+"\"";
+    };
 };
 
 const OrmQueryResponse=function(){
