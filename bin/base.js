@@ -47,6 +47,12 @@ const OrmBase = function(context){
 
         var _res={};
         
+        var ormQueryCallback = new OrmQueryCallback();
+
+        if(callback){
+            ormQueryCallback.then(callback);
+        }
+
         sync([
             function(next){
 
@@ -171,10 +177,25 @@ const OrmBase = function(context){
                     response.result=_res.result;
                 }
 
-                callback(response);
+                if(ormQueryCallback._callback){
+                    ormQueryCallback._callback(response);
+                }
+
+                if(ormQueryCallback._callbackError){
+                    if(response.status==false){
+                        ormQueryCallback._callbackError(response.error);
+                    }
+                }
+
+                if(ormQueryCallback._callbackSuccess){
+                    if(response.status==true){
+                        ormQueryCallback._callbackSuccess(response.result);
+                    }
+                }
             },
         ]);
 
+        return ormQueryCallback;
     };
 
     /**
@@ -227,6 +248,39 @@ const OrmBase = function(context){
 const OrmQueryResponse=function(){
 
     this.status=true;
+
+};
+const OrmQueryCallback=function(){
+
+    /**
+     * then
+     * @param {*} callback 
+     * @returns 
+     */
+    this.then=function(callback){
+        this._callback=callback;
+        return this;
+    };
+
+    /**
+     * error
+     * @param {*} callback 
+     * @returns 
+     */
+    this.error=function(callback){
+        this._callbackError=callback;
+        return this;
+    };
+
+    /**
+     * success
+     * @param {*} callback 
+     * @returns 
+     */
+    this.success=function(callback){
+        this._callbackSuccess=callback;
+        return this;
+    };
 
 };
 

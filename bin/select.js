@@ -11,7 +11,6 @@
  */
 
 const OrmSqlBuilder = require("./sqlBuilder.js");
-const OrmSelectResponse = require("./selectResponse.js");
 const sync = require("./sync.js");
 
 const OrmSelect = function(topContent,baseObj){
@@ -21,10 +20,19 @@ const OrmSelect = function(topContent,baseObj){
     /**
      * select
      * @param {*} params 
-     * @param {*} callback 
      */
-    this.select=function(params, callback){
+    this.select=function(params){
 
+        var colum=Object.keys(prams);
+        for(var n=0;n<colum.length;n++){
+            var method=colum[n];
+            var param=params[method];
+            
+            if(this[method]){
+                this[method](...param);
+            }
+
+        }
 
     };
 
@@ -120,12 +128,18 @@ const OrmSelect = function(topContent,baseObj){
         return this;
     }
 
+
     /**
      * all
      * @param {*} callback 
+     * @param {*} type 
      */
-    this.all=function(callback){
+    this.all=function(callback,type){
 
+        if(!type){
+            type="all";
+        }
+        
         if(topContent.selectBefore){
             topContent.selectBefore(this);
         }
@@ -137,9 +151,9 @@ const OrmSelect = function(topContent,baseObj){
         baseObj.query(sql,null,function(res){
 
             if(topContent.selectAfter){
-                var buffer=topContent.selectAfter(res);
+                var buffer=topContent.selectAfter(type,res);
                 if(buffer){
-                    result=buffer;
+                    res=buffer;
                 }
             }
             
@@ -158,7 +172,7 @@ const OrmSelect = function(topContent,baseObj){
                 res.result=res.result[0];
             }
             callback(res);
-        });
+        },"first");
     };
 
     /**
@@ -168,6 +182,10 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} option 
      */
     this.value=function(field,callback,option){
+
+        if(!option){
+            option={};
+        }
 
         if(!option.noResetField){
             this.field().field([field]);
@@ -179,7 +197,7 @@ const OrmSelect = function(topContent,baseObj){
             }
 
             callback(res);
-        });
+        },"value");
     };
 
     /**
@@ -276,7 +294,7 @@ const OrmSelect = function(topContent,baseObj){
             res.result=list;
 
             callback(res);
-        });
+        },"list");
 
     };
 
@@ -295,7 +313,7 @@ const OrmSelect = function(topContent,baseObj){
                 }
 
                 callback(res);
-            });
+            },"count");
     };
 
     /**
