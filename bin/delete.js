@@ -144,6 +144,9 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
 
         var onValue=1;
         if(logicalDeleteKey.type=="date"){
+            onValue=DateFormat(null,"Y-m-d");
+        }
+        else if(logicalDeleteKey.type=="datetime"){
             onValue=DateFormat(null,"Y-m-d H:i:s");
         }
 
