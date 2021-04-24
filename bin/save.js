@@ -107,6 +107,13 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
             params[timeStamp.modified] = DateFormat(null,"Y-m-d H:i:s");
         }
 
+        if(topContent.saveBefore){
+            var buffer=topContent.saveBefore("insert",params);
+            if(buffer){
+                params=buffer;
+            }
+        }
+
         var sql=sqlBuilder.build.insert(params);
         
         sqlBuilder.clearBuffer();
@@ -142,18 +149,20 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
                 }
                 else{
 
-                    if(!(responseStatus || surrogateKey)){
+                    if(!responseStatus){
+                        if(surrogateKey){
                         
-                        if(response.status){
-                            if(ormCallback._callbackSuccess){
-                                ormCallback._callbackSuccess(response.result);
-                            }    
+                            if(response.status){
+                                if(ormCallback._callbackSuccess){
+                                    ormCallback._callbackSuccess(response.result);
+                                }    
+                            }
+    
+                            if(ormCallback._callback){
+                                ormCallback._callback(response);
+                            } 
+                            return;
                         }
-
-                        if(ormCallback._callback){
-                            ormCallback._callback(response);
-                        } 
-                        return;
                     }
     
                     selectObj
@@ -232,6 +241,13 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
             }    
         }
 
+        if(topContent.saveBefore){
+            var buffer=topContent.saveBefore("update",params);
+            if(buffer){
+                params=buffer;
+            }
+        }
+
         var sql=sqlBuilder.build.update(params);
 
         sqlBuilder.clearBuffer();
@@ -266,18 +282,20 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
                 }
                 else{
     
-                    if(!(responseStatus || surrogateKey)){
+                    if(!responseStatus){
+                        if(surrogateKey){
                         
-                        if(response.status){
-                            if(ormCallback._callbackSuccess){
-                                ormCallback._callbackSuccess(response.result);
-                            }    
+                            if(response.status){
+                                if(ormCallback._callbackSuccess){
+                                    ormCallback._callbackSuccess(response.result);
+                                }    
+                            }
+        
+                            if(ormCallback._callback){
+                                ormCallback._callback(response);
+                            } 
+                            return;
                         }
-    
-                        if(ormCallback._callback){
-                            ormCallback._callback(response);
-                        } 
-                        return;
                     }
     
                     selectObj

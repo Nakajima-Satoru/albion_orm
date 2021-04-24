@@ -13,6 +13,7 @@
  const OrmSqlBuilder = require("./sqlBuilder.js");
  const DateFormat = require("./dateFormat.js");
  const sync = require("./sync.js");
+ const OrmCallback = require("./callback.js");
 
 const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
 
@@ -91,10 +92,10 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
         }
 
         if(delType==0){
-            this.physicalDelete(params,option,callback);
+            return this.physicalDelete(params,option,callback);
         }
         else if(delType==1){
-            this.logicalDelete(params,option,callback);
+            return this.logicalDelete(params,option,callback);
         }
 
     };
@@ -124,9 +125,7 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
 
         sqlBuilder.clearBuffer();
 
-        baseObj.query(sql,null,function(res){
-            callback(res);
-        });
+        return baseObj.query(sql,null,callback);
 
     };
 
@@ -150,6 +149,12 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
             onValue=DateFormat(null,"Y-m-d H:i:s");
         }
 
+        var ormCallback = new OrmCallback();
+
+        if(callback){
+            ormCallback._callback=callback;
+        }
+
         if(surrogateKey){
             if(params){
 
@@ -159,7 +164,12 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
 
                 var length=params.length;
 
-                var response=[];
+                var response={
+                    statusSuccess:true,
+                    statusError:false,
+                    success:[],
+                    error:[],
+                };
 
                 sync().foreach(params,function(next,index,value){
 
@@ -170,23 +180,65 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
 
                     saveObj.update(updateData,option,function(res){
 
-                        if(!res.status){
-                            return callback(res);
+                        if(res.status){
+                           response.success.push(res.result); 
+                        }
+                        else{
+                            response.statusSuccess=false;
+                            response.statusError=true;
+                            response.error.push(res.error); 
                         }
 
-                        response.push(res.result);
-s
+                        if(!res.status){
+                            if(ormCallback._callbackError){
+                                ormCallback._callbackError(res.error);
+                            }
+                        }
+
                         if(index < length-1){
                             next();
                         }
                         else{
-                            res.result=response;
-                            callback(res);
+
+                            if(response.statusError){
+                                if(ormCallback._callbackSuccess){
+                                    ormCallback._callbackSuccess(response.error);
+                                }    
+                            }
+
+                            if(response.statusSuccess){
+                                if(ormCallback._callbackSuccess){
+                                    ormCallback._callbackSuccess(response.success);
+                                }    
+                            }
+
+                            if(ormCallback._callback){
+
+                                var res2={
+                                    result:response.success,
+                                    error:response.error,
+                                };
+
+                                if(response.statusSuccess){
+                                    res2.status=true;    
+                                }
+                                else{
+                                    res2.status=false;
+                                }
+
+                                ormCallback._callback(res2);
+                            }
+
                         }
                     });
 
                 });
 
+            }
+            else{
+
+
+                
             }
         }
         else{
@@ -203,6 +255,7 @@ s
 
         }
 
+        return ormCallback;
     };
 
     /**
