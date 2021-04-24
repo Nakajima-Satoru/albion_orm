@@ -12,6 +12,7 @@
 
 const OrmSqlBuilder = require("./sqlBuilder.js");
 const sync = require("./sync.js");
+const OrmCallback = require("./callback.js");
 
 const OrmSelect = function(topContent,baseObj){
 
@@ -133,8 +134,9 @@ const OrmSelect = function(topContent,baseObj){
      * all
      * @param {*} callback 
      * @param {*} type 
+     * @param {*} field 
      */
-    this.all=function(callback,type){
+    this.all=function(callback,type,field){
 
         if(!type){
             type="all";
@@ -148,17 +150,75 @@ const OrmSelect = function(topContent,baseObj){
 
         sqlBuilder.clearBuffer();
         
+        var ormCallback= new OrmCallback();
+
+        if(callback){
+            ormCallback._callback=callback;
+        }
+
         baseObj.query(sql,null,function(res){
 
-            if(topContent.selectAfter){
-                var buffer=topContent.selectAfter(type,res);
-                if(buffer){
-                    res=buffer;
+            if(!res.status){
+                if(ormCallback._callbackError){
+                    ormCallback._callbackError(res.error);
                 }
             }
             
-            callback(res);
+            if(res.status){
+
+
+                if(type=="first"){
+                    res.result=res.result[0];
+                }
+                else if(type=="value"){
+                    res.result=res.result[0][field];
+                }
+                else if(type=="list"){
+
+                    if(typeof field == "string"){
+                        var list=[];
+                    }
+                    else{
+                        var list={};
+                    }
+
+                    for(var n=0;n<res.result.length;n++){
+
+                        var row=res.result[n];
+        
+                        if(typeof field == "string"){
+                            list.push(row[field]);
+                        }
+                        else{
+                            list[row[field[0]]]=row[field[1]];
+                        }
+            
+                    }
+
+                    res.result=list;
+                }
+                else if(type=="count"){
+                    res.result=res.result[0].count;
+                }
+
+                if(topContent.selectAfter){
+                    var buffer=topContent.selectAfter(type,res);
+                    if(buffer){
+                        res=buffer;
+                    }
+                }
+                if(ormCallback._callbackSuccess){
+                    ormCallback._callbackSuccess(res.result);
+                }    
+            }
+            
+            if(ormCallback._callback){
+                ormCallback._callback(res);
+            }
+
         });
+
+        return ormCallback;
     };
 
     /**
@@ -166,13 +226,7 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.first=function(callback){
-        this.limit(1).all(function(res){
-
-            if(res.status){
-                res.result=res.result[0];
-            }
-            callback(res);
-        },"first");
+        return this.limit(1).all(callback,"first");
     };
 
     /**
@@ -190,14 +244,8 @@ const OrmSelect = function(topContent,baseObj){
         if(!option.noResetField){
             this.field().field([field]);
         }
-        this.all(function(res){
 
-            if(res.status){
-                res.result=res.result[0][field];
-            }
-
-            callback(res);
-        },"value");
+        return this.all(callback,"value",field);
     };
 
     /**
@@ -206,7 +254,7 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.min=function(field,callback){
-        this
+        return this
             .field()
             .field(["MIN("+field+") AS "+field])
             .value(field,callback,{
@@ -220,7 +268,7 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.max=function(field,callback){
-        this
+        return this
             .field()
             .field(["MAX("+field+") AS "+field])
             .value(field,callback,{
@@ -234,7 +282,7 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.avg=function(field,callback){
-        this
+        return this
             .field()
             .field(["AVG("+field+") AS "+field])
             .value(field,callback,{
@@ -248,7 +296,7 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.sum=function(field,callback){
-        this
+        return this
             .field()
             .field(["SUM("+field+") AS "+field])
             .value(field,callback,{
@@ -264,38 +312,13 @@ const OrmSelect = function(topContent,baseObj){
     this.list=function(field,callback){
 
         if(typeof field=="string"){
-            var list=[];
             this.field().field([field]);
         }
         else{
-            var list={};
             this.field().field([field[0],field[1]]);
         }
 
-        this.all(function(res){
-
-            if(!res.status){
-                return callback(res);
-            }
-
-            for(var n=0;n<result.length;n++){
-
-                var row=result[n];
-
-                if(typeof field=="string"){
-                    list.push(row[field]);
-                }
-                else{
-                    list[row[field[0]]]=row[field[1]];
-                }
-    
-            }
-
-            res.result=list;
-
-            callback(res);
-        },"list");
-
+        return this.all(callback,"list",field);
     };
 
     /**
@@ -303,17 +326,11 @@ const OrmSelect = function(topContent,baseObj){
      * @param {*} callback 
      */
     this.count=function(callback){
-        this
+
+        return this
             .field()
             .field(["count(*) as count"])
-            .all(function(res){
-
-                if(res.status){
-                    res.result=res.result[0].count;
-                }
-
-                callback(res);
-            },"count");
+            .all(callback,"count");
     };
 
     /**
@@ -334,6 +351,12 @@ const OrmSelect = function(topContent,baseObj){
 
         var cont=this;
 
+        var ormCallback= new OrmCallback();
+
+        if(callback){
+            ormCallback._callback=callback;
+        }
+
         sync([
             function(next){
 
@@ -342,7 +365,14 @@ const OrmSelect = function(topContent,baseObj){
                     .count(function(res){
 
                         if(!res.status){
-                            return callback(res);
+                            if(ormCallback._callbackError){
+                                ormCallback._callbackError(res.error);
+                            }
+
+                            if(ormCallback._callback){
+                                ormCallback._callback(res);
+                            }
+                            return;
                         }
 
                         totalCount=res.result;
@@ -351,30 +381,42 @@ const OrmSelect = function(topContent,baseObj){
                     });
 
             },
-            function(next){
+            function(){
 
                 cont
                     .limit(limit,offset)
                     .all(function(res){
         
                         if(!res.status){
-                            return callback(res);
+                            if(ormCallback._callbackError){
+                                ormCallback._callbackError(res.error);
+                            }
                         }
-        
-                        var totalPage=Math.ceil(totalCount/limit);
+                        else{
 
-                        res.paginate={
-                            totalcount:totalCount,
-                            totalPage:totalPage,
-                            page:page,
-                            limit:limit,
-                        };
+                            var totalPage=Math.ceil(totalCount/limit);
 
-                        callback(res);        
+                            res.paginate={
+                                totalcount:totalCount,
+                                totalPage:totalPage,
+                                page:page,
+                                limit:limit,
+                            };
+
+                            if(ormCallback._callbackSuccess){
+                                ormCallback._callbackSuccess(res);
+                            }
+                        }        
+
+                        if(ormCallback._callback){
+                            ormCallback._callback(res);
+                        }
+
                     });
             },
         ]);
 
+        return ormCallback;
     };
 
     /**

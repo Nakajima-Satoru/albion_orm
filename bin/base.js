@@ -12,6 +12,7 @@
 
 const ormConnection = require("./connection.js");
 const sync = require("./sync.js");
+const OrmCallback = require("./callback.js");
 
 const OrmBase = function(context){
 
@@ -47,10 +48,10 @@ const OrmBase = function(context){
 
         var _res={};
         
-        var ormQueryCallback = new OrmQueryCallback();
+        var ormCallback = new OrmCallback();
 
         if(callback){
-            ormQueryCallback.then(callback);
+            ormCallback.then(callback);
         }
 
         sync([
@@ -177,25 +178,25 @@ const OrmBase = function(context){
                     response.result=_res.result;
                 }
 
-                if(ormQueryCallback._callback){
-                    ormQueryCallback._callback(response);
+                if(ormCallback._callback){
+                    ormCallback._callback(response);
                 }
 
-                if(ormQueryCallback._callbackError){
+                if(ormCallback._callbackError){
                     if(response.status==false){
-                        ormQueryCallback._callbackError(response.error);
+                        ormCallback._callbackError(response.error);
                     }
                 }
 
-                if(ormQueryCallback._callbackSuccess){
+                if(ormCallback._callbackSuccess){
                     if(response.status==true){
-                        ormQueryCallback._callbackSuccess(response.result);
+                        ormCallback._callbackSuccess(response.result);
                     }
                 }
             },
         ]);
 
-        return ormQueryCallback;
+        return ormCallback;
     };
 
     /**
@@ -250,38 +251,4 @@ const OrmQueryResponse=function(){
     this.status=true;
 
 };
-const OrmQueryCallback=function(){
-
-    /**
-     * then
-     * @param {*} callback 
-     * @returns 
-     */
-    this.then=function(callback){
-        this._callback=callback;
-        return this;
-    };
-
-    /**
-     * error
-     * @param {*} callback 
-     * @returns 
-     */
-    this.error=function(callback){
-        this._callbackError=callback;
-        return this;
-    };
-
-    /**
-     * success
-     * @param {*} callback 
-     * @returns 
-     */
-    this.success=function(callback){
-        this._callbackSuccess=callback;
-        return this;
-    };
-
-};
-
 module.exports=OrmBase;

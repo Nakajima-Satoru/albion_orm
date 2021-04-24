@@ -13,7 +13,8 @@
 const OrmSqlBuilder = require("./sqlBuilder.js");
 const sync = require("./sync.js");
 const DateFormat = require("./dateFormat.js");
- 
+const OrmCallback = require("./callback.js");
+
 const OrmSave = function(topContent,baseObj,showObj,selectObj){
 
     var sqlBuilder = new OrmSqlBuilder(topContent);
@@ -69,14 +70,14 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
         var surrogateKey=topContent.checkSurrogateKey();
 
         if(!surrogateKey){
-            return;
+            return this.insert(params,option,callback);
         }
 
         if(!params[surrogateKey]){
-            this.insert(params,option,callback);
+            return this.insert(params,option,callback);
         }
         else{
-            this.update(params,option,callback);
+            return this.update(params,option,callback);
         }
 
     };
@@ -110,38 +111,78 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
         
         sqlBuilder.clearBuffer();
 
+        var ormCallback = new OrmCallback();
+
+        if(callback){
+            ormCallback._callback=callback;
+        }
+
         var response={};
 
         sync([
             function(next){
                 baseObj.query(sql,null,function(res){
-                    
-                    if(!res.status){
-                        return callback(res);
-                    }
-
-                    if(responseStatus && surrogateKey){
-                        response=res.result;
-                        next();
-                    }
-                    else{
-                        callback(res);
-                    }
+                    response=res;
+                    next();
                 });
             },
             function(){
 
-                selectObj
-                    .where(surrogateKey,"=",response.insertId)
-                    .first(function(res){
-                        callback(res);
-                    });
-                ;
+                if(!response.status){
+                    if(ormCallback._callbackError){
+                        ormCallback._callbackError(response.error);
+                    }
+
+
+                    if(ormCallback._callback){
+                        ormCallback._callback(response);
+                    } 
+
+                    return;
+                }
+                else{
+
+                    if(!(responseStatus || surrogateKey)){
+                        
+                        if(response.status){
+                            if(ormCallback._callbackSuccess){
+                                ormCallback._callbackSuccess(response.result);
+                            }    
+                        }
+
+                        if(ormCallback._callback){
+                            ormCallback._callback(response);
+                        } 
+                        return;
+                    }
+    
+                    selectObj
+                        .where(surrogateKey,"=",response.result.insertId)
+                        .first(function(res){
+
+                            if(!res.status){
+                                if(ormCallback._callbackError){
+                                    ormCallback._callbackError(res.error);
+                                }
+                            }
+                            else{
+                                if(ormCallback._callbackSuccess){
+                                    ormCallback._callbackSuccess(res.result);
+                                }    
+                            }
+    
+                            if(ormCallback._callback){
+                                ormCallback._callback(res);
+                            } 
+                        });
+                    ;
+
+                }
 
             },
-        ])
+        ]);
 
-
+        return ormCallback;
     };
 
     /**
@@ -151,9 +192,6 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
      */
     this.getInsertSql=function(params){
         var str = sqlBuilder.build.insert(params);
-
-        sqlBuilder.clearBuffer();
-
         return str;
     }
 
@@ -198,34 +236,75 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
 
         sqlBuilder.clearBuffer();
 
+        var ormCallback = new OrmCallback();
+
+        if(callback){
+            ormCallback._callback=callback;
+        }
+
+        var response={};
+
         sync([
             function(next){
                 baseObj.query(sql,null,function(res){
-
-                    if(!res.status){
-                        return callback(res);
-                    }
-
-                    if(responseStatus && surrogateKey && !surrogateOff){
-                        next();
-                    }
-                    else{
-                        callback(res);
-                    }
+                    response=res;
+                    next();
                 });
             },
             function(){
 
-                selectObj
-                    .where(surrogateKey,"=",_sid)
-                    .first(function(res){
-                        callback(res);
-                    });
-                ;
-
+                if(!response.status){
+                    if(ormCallback._callbackError){
+                        ormCallback._callbackError(response.error);
+                    }
+    
+    
+                    if(ormCallback._callback){
+                        ormCallback._callback(response);
+                    } 
+                    return;
+                }
+                else{
+    
+                    if(!(responseStatus || surrogateKey)){
+                        
+                        if(response.status){
+                            if(ormCallback._callbackSuccess){
+                                ormCallback._callbackSuccess(response.result);
+                            }    
+                        }
+    
+                        if(ormCallback._callback){
+                            ormCallback._callback(response);
+                        } 
+                        return;
+                    }
+    
+                    selectObj
+                        .where(surrogateKey,"=",_sid)
+                        .first(function(res){
+    
+                            if(!res.status){
+                                if(ormCallback._callbackError){
+                                    ormCallback._callbackError(res.error);
+                                }
+                            }
+                            else{
+                                if(ormCallback._callbackSuccess){
+                                    ormCallback._callbackSuccess(res.result);
+                                }    
+                            }
+    
+                            if(ormCallback._callback){
+                                ormCallback._callback(res);
+                            } 
+                        });
+                    ;
+                }
             },
-        ]);        
-
+        ]);     
+        
+        return ormCallback;
     };
 
     /**
@@ -258,8 +337,6 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
         }
 
         var sql=sqlBuilder.build.update(params);
-
-        sqlBuilder.clearBuffer();
         
         return sql;
     }

@@ -20,6 +20,10 @@ const Ormtransaction = require("./transaction.js");
 
 const albionOrm=function(context){
 
+    if(!context){
+        context=this;
+    }
+
     var _connection=null;
     var _baseObj=null;
     var _selectObj=null;
@@ -49,15 +53,32 @@ const albionOrm=function(context){
      * @returns 
      */
     this.setTable = function(tableName){
+        if(context==undefined){
+            context={};
+        }
         context.table=tableName;
         return this;
     };
+
+    /**
+     * getTable
+     * @returns 
+     */
+    this.getTable=function(){
+        if(context==undefined){
+            context={};
+        }
+        return context.table;
+    }
 
     /**
      * setSurrogateKey
      * @param {*} field 
      */
     this.setSurrogateKey=function(field){
+        if(context==undefined){
+            context={};
+        }
         context.surrogateKey=field;
         return this;
     }
@@ -67,6 +88,9 @@ const albionOrm=function(context){
      * @param {*} params 
      */
     this.setTimeStamp=function(params){
+        if(context==undefined){
+            context={};
+        }
         context.timeStamp=params;
         return this;
     }
@@ -76,6 +100,9 @@ const albionOrm=function(context){
      * @returns 
      */
     this.getTimeStamp=function(){
+        if(context==undefined){
+            context={};
+        }
         return context.timeStamp;
     }
 
@@ -85,6 +112,9 @@ const albionOrm=function(context){
      * @returns 
      */
     this.setLogicalDeleteKey=function(params){
+        if(context==undefined){
+            context={};
+        }
         context.logicalDeleteKey=params;
         return this;
     };
@@ -94,6 +124,9 @@ const albionOrm=function(context){
      * @returns 
      */
     this.getLogicalDeleteKey=function(){
+        if(context==undefined){
+            context={};
+        }
         return context.logicalDeleteKey;
     };
 
@@ -105,7 +138,6 @@ const albionOrm=function(context){
         if(_baseObj){
             return _baseObj.getLog();
         }
-
         return null;
     };
 
@@ -125,6 +157,9 @@ const albionOrm=function(context){
      * @param {*} field 
      */
      this.checkSurrogateKey=function(){
+         if(context==undefined){
+             context={};
+         }
          return context.surrogateKey;
     }
 
@@ -156,7 +191,7 @@ const albionOrm=function(context){
             _selectObj=new OrmSelect(context,_baseObj);
         }
         if(params){
-            _selectObj.select(params,callback);
+            return _selectObj.select(params,callback);
         }
         else{
             return _selectObj;
@@ -172,7 +207,7 @@ const albionOrm=function(context){
             _baseObj=new ormBase(this);
         }
         if(!_showObj){
-            _showObj = new OrmShow(context,_baseObj);
+            return _showObj = new OrmShow(context,_baseObj);
         }
         return _showObj;
     };
@@ -198,7 +233,7 @@ const albionOrm=function(context){
             _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
         }
         if(params){
-            _saveObj.auto(params,responseStatuis,callback);
+            return _saveObj.auto(params,responseStatuis,callback);
         }
         else{
             return _saveObj;
@@ -226,7 +261,7 @@ const albionOrm=function(context){
             _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
         }
         if(params){
-            _saveObj.insert(params,option,callback);
+            return _saveObj.insert(params,option,callback);
         }
         else{
             return _saveObj;
@@ -255,7 +290,7 @@ const albionOrm=function(context){
         }
 
         if(params){
-            _saveObj.update(params,option,callback);
+            return _saveObj.update(params,option,callback);
         }
         else{
             return _saveObj;
@@ -286,7 +321,7 @@ const albionOrm=function(context){
             _deleteObj=new OrmDelete(context,_baseObj,_selectObj,_saveObj);
         }
         if(params){
-            _deleteObj.delete(params,option,callback);
+            return _deleteObj.delete(params,option,callback);
         }
         else{
             return _deleteObj;
