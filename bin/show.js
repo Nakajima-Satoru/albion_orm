@@ -18,7 +18,7 @@ const OrmShow = function(topContent,baseObj){
      */
     this.getField=function(callback){
 
-        var sqlType=topContent._orm.connection().type;
+        var sqlType=topContent.connection().type;
 
         var tableName=topContent.table;
 
@@ -31,9 +31,7 @@ const OrmShow = function(topContent,baseObj){
 			sql="PRAGMA table_info('"+tableName+"')";
         }
 
-        baseObj.query(sql,null,function(res){
-            callback(res);
-        });
+        return baseObj.query(sql,null,callback);
     };
 
     /**
@@ -42,7 +40,7 @@ const OrmShow = function(topContent,baseObj){
      */
     this.getIndex=function(callback){
 
-        var sqlType=topContent._orm.connection().type;
+        var sqlType=topContent.connection().type;
 
         var tableName=topContent.table;
 
@@ -55,9 +53,7 @@ const OrmShow = function(topContent,baseObj){
 			sql="select * from sqlite_master where name='"+tableName+"'";
 		}
 
-        baseObj.query(sql,null,function(res){
-            callback(res);
-        });
+        return baseObj.query(sql,null,callback);
     };
 
     /**
@@ -68,9 +64,7 @@ const OrmShow = function(topContent,baseObj){
 
         var sql="SHOW DATABASES";
 
-        baseObj.query(sql,null,function(res){
-            callback(res);
-        });
+        return baseObj.query(sql,null,callback);
     };
 
     /**
@@ -81,9 +75,7 @@ const OrmShow = function(topContent,baseObj){
 
 		var sql="SHOW TABLES;";
 
-        baseObj.query(sql,null,function(res){
-            callback(res);
-        });
+        return baseObj.query(sql,null,callback);
     };
 
     /**
@@ -94,9 +86,7 @@ const OrmShow = function(topContent,baseObj){
 
 	    var sql="SHOW VARIABLES;";
 
-        baseObj.query(sql,null,function(res){
-            callback(res);
-        });
+        return baseObj.query(sql,null,callback);
     };
 
     /**
@@ -106,9 +96,7 @@ const OrmShow = function(topContent,baseObj){
     this.getProcessList=function(callback){
         var sql="SHOW PROCESSLIST;";
         
-        baseObj.query(sql,null,function(res){
-            callback(res);
-        });
+        return baseObj.query(sql,null,callback);
     };
     
 };
