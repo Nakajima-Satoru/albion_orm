@@ -1,7 +1,23 @@
+/**
+ * ==================================================
+ * 
+ * ALBION_ORM Ver 1.0.0
+ * 
+ * migration.js (OrmMigration)
+ * 
+ * CopyLight: Nakajima-Satoru since 0201/04/16
+ * 
+ * ==================================================
+ */
+
 const OrmMMigrationSqlBuilder = function(sqlType,buildData){
 
     var defaultOption={};
 
+    /**
+     * run
+     * @returns 
+     */
     this.run=function(){
 
         var response=[];
@@ -47,6 +63,11 @@ const OrmMMigrationSqlBuilder = function(sqlType,buildData){
         return response;
     };
 
+    /**
+     * comment
+     * @param {*} data 
+     * @returns 
+     */
     this.comment=function(data){
         if(sqlType=="sqlite3"){
             return "";
@@ -56,6 +77,11 @@ const OrmMMigrationSqlBuilder = function(sqlType,buildData){
         return str;
     };
 
+    /**
+     * createDatabase
+     * @param {*} data 
+     * @returns 
+     */
     this.createDatabase=function(data){
 
         if(sqlType=="sqlite3"){
@@ -85,6 +111,11 @@ const OrmMMigrationSqlBuilder = function(sqlType,buildData){
         return str;
     };
 
+    /**
+     * changeDatabase
+     * @param {*} data 
+     * @returns 
+     */
     this.changeDatabase=function(data){
 
         if(sqlType=="sqlite3"){
@@ -95,6 +126,11 @@ const OrmMMigrationSqlBuilder = function(sqlType,buildData){
         return str;
     };
 
+    /**
+     * createTable
+     * @param {*} data 
+     * @returns 
+     */
     this.createTable=function(data){
 
         var str="CREATE TABLE ";
@@ -315,7 +351,6 @@ const OrmMMigrationSqlBuilder = function(sqlType,buildData){
 
         return "\""+string+"\"";
     };
-
 
     return this.run();
 };
