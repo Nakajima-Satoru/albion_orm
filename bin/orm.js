@@ -329,6 +329,153 @@ const albionOrm=function(context){
     };
 
     /**
+     * physicalDelete
+     * @param {*} params 
+     * @param {*} callback 
+     * @returns 
+     */
+    this.physicalDelete=function(params,callback){
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        if(!_selectObj){
+            _selectObj=new OrmSelect(context,_baseObj);
+        }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
+        if(!_saveObj){
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
+        }
+        if(!_deleteObj){
+            _deleteObj=new OrmDelete(context,_baseObj,_selectObj,_saveObj);
+        }
+        return _deleteObj.physicalDelete(params,callback);
+    };
+
+    /**
+     * physicalDeleteSql
+     * @param {*} params 
+     * @returns 
+     */
+     this.physicalDeleteSql=function(params){
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        if(!_selectObj){
+            _selectObj=new OrmSelect(context,_baseObj);
+        }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
+        if(!_saveObj){
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
+        }
+        if(!_deleteObj){
+            _deleteObj=new OrmDelete(context,_baseObj,_selectObj,_saveObj);
+        }
+        return _deleteObj.physicalDeleteSql(params);
+    };
+
+    /**
+     * logicalDelete
+     * @param {*} params 
+     * @param {*} callback 
+     * @returns 
+     */
+    this.logicalDelete=function(params,callback){
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        if(!_selectObj){
+            _selectObj=new OrmSelect(context,_baseObj);
+        }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
+        if(!_saveObj){
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
+        }
+        if(!_deleteObj){
+            _deleteObj=new OrmDelete(context,_baseObj,_selectObj,_saveObj);
+        }
+        return _deleteObj.logicalDelete(params,callback);
+    };
+
+    /**
+     * logicalDeleteSql
+     * @param {*} params
+     * @returns 
+     */
+     this.logicalDeleteSql=function(params){
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        if(!_selectObj){
+            _selectObj=new OrmSelect(context,_baseObj);
+        }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
+        if(!_saveObj){
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
+        }
+        if(!_deleteObj){
+            _deleteObj=new OrmDelete(context,_baseObj,_selectObj,_saveObj);
+        }
+        return _deleteObj.logicalDeleteSql(params);
+    };
+
+    /**
+     * revert
+     * @param {*} params 
+     * @param {*} callback 
+     * @returns 
+     */
+    this.revert=function(params,callback){
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        if(!_selectObj){
+            _selectObj=new OrmSelect(context,_baseObj);
+        }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
+        if(!_saveObj){
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
+        }
+        if(!_deleteObj){
+            _deleteObj=new OrmDelete(context,_baseObj,_selectObj,_saveObj);
+        }
+        return _deleteObj.revert(params,callback);
+    };
+
+    /**
+     * revertSql
+     * @param {*} params 
+     * @returns 
+     */
+     this.revertSql=function(params){
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        if(!_selectObj){
+            _selectObj=new OrmSelect(context,_baseObj);
+        }
+        if(!_showObj){
+            _showObj = new OrmShow(context,_baseObj);
+        }
+        if(!_saveObj){
+            _saveObj=new OrmSave(context,_baseObj,_showObj,_selectObj);
+        }
+        if(!_deleteObj){
+            _deleteObj=new OrmDelete(context,_baseObj,_selectObj,_saveObj);
+        }
+        return _deleteObj.revertSql(params);
+    };
+
+    /**
      * migration
      */
     this.migration = function(){

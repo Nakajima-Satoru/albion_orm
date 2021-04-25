@@ -103,10 +103,25 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
     /**
      * physicalDelete
      * @param {*} params 
-     * @param {*} option 
      * @param {*} callback 
      */
-    this.physicalDelete = function(params,option,callback){
+    this.physicalDelete = function(params,callback){
+
+        var sql=this.physicalDeleteSql(params);
+
+        if(!sql){
+            return;
+        }
+
+        return baseObj.query(sql,null,callback);
+    };
+
+    /**
+     * physicalDeleteSql
+     * @param {*} params 
+     * @returns 
+     */
+    this.physicalDeleteSql=function(params){
 
         var surrogateKey=topContext.checkSurrogateKey();
 
@@ -121,141 +136,77 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
             }
         }
     
-        var sql = sqlBuilder.build.delete();
-
-        sqlBuilder.clearBuffer();
-
-        return baseObj.query(sql,null,callback);
-
+        var sql = sqlBuilder.build.physicalDelete();
+        return sql;
     };
 
     /**
      * logicalDelete
      * @param {*} params 
-     * @param {*} option 
      * @param {*} callback 
      */
-    this.logicalDelete=function(params,option,callback){
+    this.logicalDelete=function(params,callback){
+
+        var sql=this.logicalDeleteSql(params);
+
+        if(!sql){
+            return;
+        }
+
+        return baseObj.query(sql,null,callback);
+    };
+
+    /**
+     * logicalDeleteSql
+     * @param {*} params 
+     * @returns 
+     */
+    this.logicalDeleteSql=function(params){
 
         var surrogateKey=topContext.checkSurrogateKey();
 
         var logicalDeleteKey = topContext.getLogicalDeleteKey();
 
+        var timeStamp = topContext.getTimeStamp();
+
+        if(!logicalDeleteKey){
+            return;
+        }
+
         var onValue=1;
-        if(logicalDeleteKey.type=="date"){
-            onValue=DateFormat(null,"Y-m-d");
-        }
-        else if(logicalDeleteKey.type=="datetime"){
-            onValue=DateFormat(null,"Y-m-d H:i:s");
-        }
-
-        var ormCallback = new OrmCallback();
-
-        if(callback){
-            ormCallback._callback=callback;
+        if(logicalDeleteKey){
+            if(logicalDeleteKey.type=="date"){
+                onValue=DateFormat(null,"Y-m-d");
+            }
+            else if(logicalDeleteKey.type=="datetime"){
+                onValue=DateFormat(null,"Y-m-d H:i:s");
+            }    
         }
 
         if(surrogateKey){
+            
             if(params){
-
                 if(typeof params === "string" || typeof params === "number"){
                     params=[params];
-                }    
-
-                var length=params.length;
-
-                var response={
-                    statusSuccess:true,
-                    statusError:false,
-                    success:[],
-                    error:[],
-                };
-
-                sync().foreach(params,function(next,index,value){
-
-                    var updateData={
-                        [surrogateKey]:params[index],
-                        [logicalDeleteKey.field]:onValue,
-                    };
-
-                    saveObj.update(updateData,option,function(res){
-
-                        if(res.status){
-                           response.success.push(res.result); 
-                        }
-                        else{
-                            response.statusSuccess=false;
-                            response.statusError=true;
-                            response.error.push(res.error); 
-                        }
-
-                        if(!res.status){
-                            if(ormCallback._callbackError){
-                                ormCallback._callbackError(res.error);
-                            }
-                        }
-
-                        if(index < length-1){
-                            next();
-                        }
-                        else{
-
-                            if(response.statusError){
-                                if(ormCallback._callbackSuccess){
-                                    ormCallback._callbackSuccess(response.error);
-                                }    
-                            }
-
-                            if(response.statusSuccess){
-                                if(ormCallback._callbackSuccess){
-                                    ormCallback._callbackSuccess(response.success);
-                                }    
-                            }
-
-                            if(ormCallback._callback){
-
-                                var res2={
-                                    result:response.success,
-                                    error:response.error,
-                                };
-
-                                if(response.statusSuccess){
-                                    res2.status=true;    
-                                }
-                                else{
-                                    res2.status=false;
-                                }
-
-                                ormCallback._callback(res2);
-                            }
-
-                        }
-                    });
-
-                });
-
+                }
+                this.where(surrogateKey,"IN",params);
             }
-            else{
-
-
-                
-            }
-        }
-        else{
-
-            option.surrogateOff=true;
-
-            var updateData={
-                [logicalDeleteKey.field]:onValue,
-            };
-
-            saveObj.update(updateData,option,function(res){
-                callback(res);
-            });
 
         }
 
-        return ormCallback;
+        var updateData={
+            [logicalDeleteKey.field]:onValue,
+        };  
+
+        if(timeStamp){
+            if(timeStamp.modified){
+                updateData[timeStamp.modified]=DateFormat(null,"Y-m-d H:i:s");
+            }
+        }
+
+        var sql = sqlBuilder.build.logicalDelete(updateData);
+
+        return sql;
     };
 
     /**
@@ -264,67 +215,65 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
      * @param {*} option 
      * @param {*} callback 
      */
-    this.revert=function(params,option,callback){
+    this.revert=function(params,callback){
+
+        var sql=this.revertSql(params);
+
+        if(!sql){
+            return;
+        }
+
+        return baseObj.query(sql,null,callback);
+    };
+
+
+    this.revertSql=function(params){
 
         var surrogateKey=topContext.checkSurrogateKey();
 
         var logicalDeleteKey = topContext.getLogicalDeleteKey();
 
-        if(surrogateKey){
+        var timeStamp = topContext.getTimeStamp();
 
+        if(!logicalDeleteKey){
+            return;
+        }
+
+        var onValue=0;
+        if(logicalDeleteKey){
+            if(logicalDeleteKey.type=="date"){
+                onValue=null;
+            }
+            else if(logicalDeleteKey.type=="datetime"){
+                onValue=null;
+            }    
+        }
+
+        if(surrogateKey){
             if(params){
 
                 if(typeof params === "string" || typeof params === "number"){
                     params=[params];
-                }    
-    
-                var length=params.length;
+                }
 
-                var response=[];
-
-                sync().foreach(params,function(next,index,value){
-
-                    var updateData={
-                        [surrogateKey]:params[index],
-                        [logicalDeleteKey.field]:null,
-                    };
-
-                    saveObj.update(updateData,option,function(res){
-
-                        if(!res.status){
-                            return callback(res);
-                        }
-
-                        response.push(res.result);
-
-                        if(index < length-1){
-                            next();
-                        }
-                        else{
-                            res.result=response;
-                            callback(res);
-                        }
-                    });
-
-                });
-
+                this.where(surrogateKey,"IN",params);
             }
 
         }
-        else{
 
-            option.surrogateOff=true;
+        var updateData={
+            [logicalDeleteKey.field]:onValue,
+        };  
 
-            var updateData={
-                [logicalDeleteKey.field]:null,
-            };
-
-            saveObj.update(updateData,option,function(res){
-                callback(res);
-            });
-
+        if(timeStamp){
+            if(timeStamp.modified){
+                updateData[timeStamp.modified]=DateFormat(null,"Y-m-d H:i:s");
+            }
         }
 
+        var sql = sqlBuilder.build.logicalDelete(updateData);
+
+        return sql;
     };
 
 };

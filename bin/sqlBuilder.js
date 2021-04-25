@@ -255,18 +255,54 @@ const OrmSqlBuilder = function(topContent){
 
             return str;
         },
-        
+
         /**
-         * delete
+         * physicalDelete
+         * @param {*} field 
+         * @param {*} value 
          * @returns 
          */
-        delete:function(){
+         physicalDelete:function(){
 
             var optionStr="";
             
             optionStr+=cont.convert.where();
 
             var str="DELETE FROM "+topContent.table+optionStr;
+
+            return str;
+        },
+
+        /**
+         * logicalDelete
+         * @param {*} params
+         * @returns 
+         */
+        logicalDelete:function(params){
+
+            var updateListStr="";
+            var optionStr="";
+
+            var colum=Object.keys(params);
+            for(var n=0;n<colum.length;n++){
+                var field=colum[n];
+                var value=params[field];
+
+                if(n!=0){
+                    updateListStr+=", ";
+                }
+
+                if(value === null){
+                    updateListStr+=field+" = NULL";
+                }
+                else{
+                    updateListStr+=field+" = "+cont._s(value);
+                }
+            }
+
+            optionStr+=cont.convert.where();
+
+            var str="UPDATE "+topContent.table+" SET "+updateListStr+optionStr;
 
             return str;
         },
