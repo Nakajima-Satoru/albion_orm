@@ -22,6 +22,7 @@ const albionOrm=function(context){
 
     if(!context){
         context=this;
+        context.ro={};
     }
 
     var _connection=null;
@@ -204,7 +205,7 @@ const albionOrm=function(context){
      */
      this.show = function(){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_showObj){
             return _showObj = new OrmShow(context,_baseObj);
@@ -221,7 +222,7 @@ const albionOrm=function(context){
      */
     this.save = function(params,responseStatuis,callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -249,7 +250,7 @@ const albionOrm=function(context){
      */
     this.insert=function(params,option,callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -277,7 +278,7 @@ const albionOrm=function(context){
      */
     this.update=function(params,option,callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -306,7 +307,7 @@ const albionOrm=function(context){
      */
     this.delete = function(params,option,callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -336,7 +337,7 @@ const albionOrm=function(context){
      */
     this.physicalDelete=function(params,callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -360,7 +361,7 @@ const albionOrm=function(context){
      */
      this.physicalDeleteSql=function(params){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -385,7 +386,7 @@ const albionOrm=function(context){
      */
     this.logicalDelete=function(params,callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -409,7 +410,7 @@ const albionOrm=function(context){
      */
      this.logicalDeleteSql=function(params){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -434,7 +435,7 @@ const albionOrm=function(context){
      */
     this.revert=function(params,callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -458,7 +459,7 @@ const albionOrm=function(context){
      */
      this.revertSql=function(params){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -480,7 +481,7 @@ const albionOrm=function(context){
      */
     this.migration = function(){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         var obj = new OrmMigration(_baseObj);
         return obj;
