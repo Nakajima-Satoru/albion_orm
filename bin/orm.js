@@ -489,13 +489,16 @@ const albionOrm=function(context){
     /**
      * transaction
      * @param {*} callback 
-     * @param {*} errCallback 
+     * @param {*} errorCallback 
      * @returns 
      */
-    this.transaction=function(callback,errCallback){
-        var obj=new Ormtransaction(context);
+    this.transaction=function(callback,errorCallback){
+        if(!_baseObj){
+            _baseObj=new ormBase(this);
+        }
+        var obj=new Ormtransaction(_baseObj);
         if(callback){
-
+            return obj.transam(callback,errorCallback);
         }
         else{
             return obj;

@@ -10,47 +10,108 @@
  * ==================================================
  */
 
-const OrmTransaction = function(topContent){
+const sync = require("./sync.js");
+
+const OrmTransaction = function(baseObj){
+
+
+    /**
+     * transam
+     * @param {*} callback 
+     * @param {*} errorCallback 
+     */
+    this.transam=function(callback,errorCallback){
+
+        var cont = this;
+
+        var _status=true;
+
+        sync([
+            function(next){
+
+                cont.begin(function(res){
+
+                    if(!res.status){
+                        errorCallback();
+                        return;
+                    }
+
+                    next();
+                });
+
+            },
+            function(next){
+                
+                var resolve=function(status){
+                    if(status==undefined){
+                        status=true;
+                    }
+                    _status=status;
+                    next();
+                };
+
+                callback(resolve);
+            },
+            function(){
+
+                if(_status){
+
+                    cont.commit(function(res){
+
+                        if(!res.status){
+                            errorCallback();
+                            return;
+                        }
+    
+                    });
+    
+                }
+                else{
+
+                    cont.rollback(function(res){
+
+                        if(!res.status){
+                            errorCallback();
+                            return;
+                        }
+    
+                    });
+    
+                }
+            },
+        ]);
+
+    };
 
     /**
      * begin
+     * @param {*} callback 
+     * @returns 
      */
-    this.begin=function(){
-
+    this.begin=function(callback){
         var sql ="BEGIN;";
-
-
-
-
+        return baseObj.query(sql,null,callback);
     };
 
     /**
      * commit
+     * @param {*} callback 
+     * @returns 
      */
-    this.commit=function(){
-
+     this.commit=function(callback){
         var sql ="COMMIT;";
-
-        
-
-
+        return baseObj.query(sql,null,callback);
     };
 
     /**
      * rollback
+     * @param {*} callback 
+     * @returns 
      */
-    this.rollback=function(){
-
+     this.rollback=function(callback){
         var sql ="ROLLBACK;";
-
-        
+        return baseObj.query(sql,null,callback);
     };
-
-
-    this.save=function(data){
-
-    };
-
 
 };
 module.exports = OrmTransaction;

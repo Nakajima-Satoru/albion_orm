@@ -80,7 +80,7 @@ const OrmConnection = function(conData,callback){
             }
 
             if(callback){
-                callback();
+                callback(_obj);
             }
         });
 

@@ -13,6 +13,7 @@
 const ormConnection = require("./connection.js");
 const sync = require("./sync.js");
 const OrmCallback = require("./callback.js");
+const hash = require("./hash.js");
 
 const OrmBase = function(context){
 
@@ -61,18 +62,11 @@ const OrmBase = function(context){
                     next();
                     return;
                 }
-
-                var sqlType=context.connection().type;
         
-                connection = new ormConnection(context.connection(),function(obj){
-                    if(sqlType=="mysql"){
-                        next();
-                    }
-                    else if(sqlType=="sqlite3"){
-                        connection=obj;
-                        next();
-                    }
-               });
+                ConnectonPooling.get(context.connection(),function(obj){
+                    connection=obj;
+                    next();
+                });
         
             },
             function(next){
@@ -81,7 +75,7 @@ const OrmBase = function(context){
                     sql:sql,
                     bind:bind,
                 });
-
+                                
                 if(connection.sqlType=="mysql"){
 
                     connection.query(sql,bind,function(error,result){
@@ -228,7 +222,6 @@ const OrmBase = function(context){
         return log;
     }
 
-
     /**
      * _s
      * @param {*} string 
@@ -251,4 +244,33 @@ const OrmQueryResponse=function(){
     this.status=true;
 
 };
+const OrmConnectionPooling=function(){
+
+    var _cp={};
+
+    this.get=function(connectionParams,callback){
+
+        var cpHash=hash("sha256",JSON.stringify(connectionParams));
+
+        if(_cp[cpHash]){
+            callback(_cp[cpHash]);
+        }
+
+        this.set(cpHash,connectionParams,callback);
+    };
+
+    this.set=function(cpHash,connectionParams,callback){
+
+         new ormConnection(connectionParams,function(obj){
+
+            _cp[cpHash]=obj;
+            callback(obj);
+
+       });
+
+    };
+
+};
+const ConnectonPooling = new OrmConnectionPooling();
+
 module.exports=OrmBase;
