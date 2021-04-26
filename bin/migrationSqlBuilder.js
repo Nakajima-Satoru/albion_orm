@@ -253,8 +253,8 @@ const OrmMMigrationSqlBuilder = function(sqlType,buildData){
 
         str+=data.viewName;
 
-        if(data.option.sql){
-            str+=" AS "+data.option.sql;
+        if(data.sql){
+            str+=" AS "+data.sql;
         }
 
         return str;
@@ -303,35 +303,6 @@ const OrmMMigrationSqlBuilder = function(sqlType,buildData){
         }
 
         str+=data.viewName;
-
-        return str;
-    };
-
-    /**
-     * insert
-     * @param {*} data 
-     * @returns 
-     */
-    this.insert=function(data){
-
-        var fieldList="";
-        var valueList="";
-
-        var colum=Object.keys(data.data);
-        for(var n=0;n<colum.length;n++){
-            var field=colum[n];
-            var value=data.data[field];
-
-            if(n!=0){
-                fieldList+=", ";
-                valueList+=", ";
-            }
-
-            fieldList+=field;
-            valueList+=this._s(value);            
-        }
-
-        var str="INSERT INTO "+data.tableName+"("+fieldList+") VALUES ("+valueList+")";
 
         return str;
     };

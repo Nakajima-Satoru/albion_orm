@@ -86,10 +86,10 @@ const OrmMigration = function(baseObj){
     /**
      * createView
      * @param {*} viewName 
-     * @param {*} option 
+     * @param {*} sql 
      * @returns 
      */
-    this.createView=function(viewName,option){
+    this.createView=function(viewName,sql){
 
         if(!option){
             option={};
@@ -98,7 +98,7 @@ const OrmMigration = function(baseObj){
         _buffer.push({
             type:"createView",
             viewName:viewName,
-            option:option,
+            sql:sql,
         });
         return this;
     };
@@ -179,21 +179,6 @@ const OrmMigration = function(baseObj){
             type:"dropView",
             viewName:viewName,
             option:option,
-        });
-        return this;
-    };
-
-    /**
-     * insert
-     * @param {*} tableName 
-     * @param {*} data 
-     * @returns 
-     */
-    this.insert=function(tableName,data){
-        _buffer.push({
-            type:"insert",
-            tableName:tableName,
-            data:data,
         });
         return this;
     };
