@@ -48,39 +48,54 @@ const OrmConnection = function(conData,callback){
             throw new Error("[CONNECT VALIDATION] The destination host name is not specified in \"host\"");
         }
 
-        if(!data.port){
-            data.port=3306;
-        }
-
         if(!data.username){
             throw new Error("[CONNECT VALIDATION] The destination username is not specified in \"username\"");
         }
 
-        if(!data.password){
-            data.password="";
-        }
-
-        if(!data.database){
-            data.database="";
-        }
-
-        var _obj = mysql.createConnection({
+        var _data={
             host:data.host,
-            port:data.port,
             user:data.username,
-            password:data.password,
-            database:data.database,
-            encoding:data.encoding,
-        });
+        };
+
+        if(data.port){
+            _data.port=data.port;
+        }
+        else{
+            _data.port=3306;
+        }
+
+        if(data.password){
+            _data.password=data.password;
+        }
+        else{
+            _data.password="";
+        }
+
+        if(data.database){
+            _data.database=data.database;
+        }
+        else{
+            _data.database="";
+        }
+
+        var _obj = mysql.createConnection(_data);
 
         _obj.connect(function(error){
+        
             if(error){
                 console.log(error.stack);
+                callback({
+                    status:false,
+                    error:error,
+                });
                 return;
             }
 
             if(callback){
-                callback(_obj);
+                callback({
+                    status:true,
+                    connection:_obj,
+                });
             }
         });
 

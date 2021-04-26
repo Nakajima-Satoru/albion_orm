@@ -11,9 +11,11 @@
  */
 
 const sync = require("./sync.js");
+const ormBase = require("./base.js");
 
-const OrmTransaction = function(baseObj){
+const OrmTransaction = function(context){
 
+    var myBaseObj=new ormBase(context);
 
     /**
      * transam
@@ -90,7 +92,7 @@ const OrmTransaction = function(baseObj){
      */
     this.begin=function(callback){
         var sql ="BEGIN;";
-        return baseObj.query(sql,null,callback);
+        return myBaseObj.query(sql,null,callback);
     };
 
     /**
@@ -100,7 +102,7 @@ const OrmTransaction = function(baseObj){
      */
      this.commit=function(callback){
         var sql ="COMMIT;";
-        return baseObj.query(sql,null,callback);
+        return myBaseObj.query(sql,null,callback);
     };
 
     /**
@@ -110,8 +112,11 @@ const OrmTransaction = function(baseObj){
      */
      this.rollback=function(callback){
         var sql ="ROLLBACK;";
-        return baseObj.query(sql,null,callback);
+        return myBaseObj.query(sql,null,callback);
     };
+
+
+    
 
 };
 module.exports = OrmTransaction;

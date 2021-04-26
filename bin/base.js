@@ -15,9 +15,7 @@ const sync = require("./sync.js");
 const OrmCallback = require("./callback.js");
 const hash = require("./hash.js");
 
-const OrmBase = function(context){
-
-    var connection = null;
+const OrmBase = function(context, topContext){
 
     var log=[];
     
@@ -43,6 +41,8 @@ const OrmBase = function(context){
      */
     this.query=function(sql,bind,callback,option){
 
+        var connection = null;
+
         if(!option){
             option={};
         }
@@ -57,17 +57,61 @@ const OrmBase = function(context){
 
         sync([
             function(next){
+               
+                var connectData=context.connection();
+                var connectionHash=hash("sha256",JSON.stringify(connectData));
 
-                if(connection){
-                    next();
-                    return;
+                if(topContext){
+                    if(topContext.ro){
+                        if(topContext.ro.connection){
+                            if(Object.keys(topContext.ro.connection).length){
+                                connection=topContext.ro.connection[connectionHash];
+                                next();
+                                return;
+                            }
+                        }
+                        else{
+                            topContext.ro.connection={};
+                        }        
+                    }
                 }
-        
+
+                new ormConnection(connectData,function(res){
+
+                    if(!res.status){
+                        if(ormCallback._callbackError){
+                            ormCallback._callbackError(res.error);
+                        }
+
+
+                        if(ormCallback._callback){
+                            ormCallback._callback(res);
+                        }
+                        return
+                    }
+
+                    if(topContext){
+                        if(topContext.ro){
+                            if(topContext.ro.connection){
+                                topContext.ro.connection[connectionHash]=res.connection;
+                                connection=res.connection;    
+                            }
+                        }
+                    }
+                    else{
+                        connection=res.connection;
+                    }
+
+                    next();        
+                });
+
+                /*
                 ConnectonPooling.get(context.connection(),function(obj){
                     connection=obj;
                     next();
                 });
-        
+                */
+
             },
             function(next){
 
@@ -244,33 +288,4 @@ const OrmQueryResponse=function(){
     this.status=true;
 
 };
-const OrmConnectionPooling=function(){
-
-    var _cp={};
-
-    this.get=function(connectionParams,callback){
-
-        var cpHash=hash("sha256",JSON.stringify(connectionParams));
-
-        if(_cp[cpHash]){
-            callback(_cp[cpHash]);
-        }
-
-        this.set(cpHash,connectionParams,callback);
-    };
-
-    this.set=function(cpHash,connectionParams,callback){
-
-         new ormConnection(connectionParams,function(obj){
-
-            _cp[cpHash]=obj;
-            callback(obj);
-
-       });
-
-    };
-
-};
-const ConnectonPooling = new OrmConnectionPooling();
-
 module.exports=OrmBase;

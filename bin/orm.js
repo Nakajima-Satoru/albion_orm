@@ -147,7 +147,7 @@ const albionOrm=function(context){
      */
     this.check = function(){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         return _baseObj.check();
     };
@@ -172,7 +172,7 @@ const albionOrm=function(context){
      */
     this.query = function(sql, bind, callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         return _baseObj.query(sql,bind, callback);
     };
@@ -185,7 +185,7 @@ const albionOrm=function(context){
      */
     this.select = function(params,callback){
         if(!_baseObj){
-            _baseObj=new ormBase(this);
+            _baseObj=new ormBase(this,context);
         }
         if(!_selectObj){
             _selectObj=new OrmSelect(context,_baseObj);
@@ -493,10 +493,7 @@ const albionOrm=function(context){
      * @returns 
      */
     this.transaction=function(callback,errorCallback){
-        if(!_baseObj){
-            _baseObj=new ormBase(this);
-        }
-        var obj=new Ormtransaction(_baseObj);
+        var obj=new Ormtransaction(this);
         if(callback){
             return obj.transam(callback,errorCallback);
         }
