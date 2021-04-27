@@ -216,6 +216,8 @@ const OrmSelect = function(topContent,baseObj){
                 ormCallback._callback(res);
             }
 
+        },{
+            connectionPooling:true,
         });
 
         return ormCallback;

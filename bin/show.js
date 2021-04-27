@@ -13,6 +13,19 @@
 const OrmShow = function(topContent,baseObj){
 
     /**
+     * _query
+     * @param {*} sql 
+     * @param {*} callback 
+     * @returns 
+     */
+    var _query=function(sql,callback){
+        return baseObj.query(sql,null,callback,{
+            connectionPooling:true,
+        });
+    };
+
+
+    /**
      * getField
      * @param {*} callback 
      */
@@ -31,7 +44,7 @@ const OrmShow = function(topContent,baseObj){
 			sql="PRAGMA table_info('"+tableName+"')";
         }
 
-        return baseObj.query(sql,null,callback);
+        return _query(sql,callback);
     };
 
     /**
@@ -53,7 +66,7 @@ const OrmShow = function(topContent,baseObj){
 			sql="select * from sqlite_master where name='"+tableName+"'";
 		}
 
-        return baseObj.query(sql,null,callback);
+        return _query(sql,callback);
     };
 
     /**
@@ -64,7 +77,7 @@ const OrmShow = function(topContent,baseObj){
 
         var sql="SHOW DATABASES";
 
-        return baseObj.query(sql,null,callback);
+        return _query(sql,callback);
     };
 
     /**
@@ -75,7 +88,7 @@ const OrmShow = function(topContent,baseObj){
 
 		var sql="SHOW TABLES;";
 
-        return baseObj.query(sql,null,callback);
+        return _query(sql,callback);
     };
 
     /**
@@ -86,7 +99,7 @@ const OrmShow = function(topContent,baseObj){
 
 	    var sql="SHOW VARIABLES;";
 
-        return baseObj.query(sql,null,callback);
+        return _query(sql,callback);
     };
 
     /**
@@ -96,7 +109,7 @@ const OrmShow = function(topContent,baseObj){
     this.getProcessList=function(callback){
         var sql="SHOW PROCESSLIST;";
         
-        return baseObj.query(sql,null,callback);
+        return _query(sql,callback);
     };
     
 };

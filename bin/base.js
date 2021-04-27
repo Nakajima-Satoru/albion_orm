@@ -11,6 +11,7 @@
  */
 
 const ormConnection = require("./connection.js");
+const OrmConnectionPooling = require("./connectionPooling.js");
 const sync = require("./sync.js");
 const OrmCallback = require("./callback.js");
 const hash = require("./hash.js");
@@ -57,8 +58,21 @@ const OrmBase = function(context, topContext){
 
         sync([
             function(next){
-               
+
                 var connectData=context.connection();
+
+                if(option.connectionPooling){
+
+                    OrmConnectionPooling.set(connectData,function(obj){
+
+                        connection=obj;
+                        next();
+
+                    },ormCallback);
+
+                    return;
+                }
+
                 var connectionHash=hash("sha256",JSON.stringify(connectData));
 
                 if(topContext){
@@ -104,13 +118,6 @@ const OrmBase = function(context, topContext){
 
                     next();        
                 });
-
-                /*
-                ConnectonPooling.get(context.connection(),function(obj){
-                    connection=obj;
-                    next();
-                });
-                */
 
             },
             function(next){
@@ -282,7 +289,6 @@ const OrmBase = function(context, topContext){
        return "\""+string+"\"";
     };
 };
-
 const OrmQueryResponse=function(){
 
     this.status=true;
