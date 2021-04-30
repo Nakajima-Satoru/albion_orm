@@ -1,25 +1,28 @@
 {
-  "name": "albion_validator",
+  "name": "albion_orm",
   "version": "1.0.0",
-  "description": "node.js web freamework \"albion\" for Validation package..",
+  "description": "node.js web freamework \"albion\" for OR-Mapping package..",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Nakajima-Satoru/albion_validator.git"
+    "url": "git+https://github.com/Nakajima-Satoru/albion_orm.git"
   },
   "keywords": [
     "framework",
     "web",
     "mvc",
-    "validation"
+    "database",
+    "mysql",
+    "sqlite3",
+    "or-mapping"  
   ],
   "author": "Nakajima-Satoru",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Nakajima-Satoru/albion_validator/issues"
+    "url": "https://github.com/Nakajima-Satoru/albion_orm/issues"
   },
-  "homepage": "https://github.com/Nakajima-Satoru/albion_validator#readme"
+  "homepage": "https://github.com/Nakajima-Satoru/albion_orm#readme"
 }
