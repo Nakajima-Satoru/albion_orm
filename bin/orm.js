@@ -1,9 +1,9 @@
 /**
  * ==================================================
  * 
- * ALBION_ORM Ver 1.0.0
+ * FW_DAGGER_ORM Ver 1.0.0
  * 
- * orm.js (albionOrm)
+ * orm.js (daggerOrm)
  * 
  * CopyLight: Nakajima-Satoru since 0201/04/16
  * 
@@ -18,7 +18,7 @@ const OrmMigration = require("./migration.js");
 const OrmShow = require("./show.js");
 const Ormtransaction = require("./transaction.js");
 
-const albionOrm=function(context){
+const daggerOrm=function(context){
 
     if(!context){
         context=this;
@@ -504,4 +504,4 @@ const albionOrm=function(context){
     };
 
 };
-module.exports=albionOrm;
+module.exports=daggerOrm;

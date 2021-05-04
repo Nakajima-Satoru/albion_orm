@@ -1,14 +1,14 @@
 {
-  "name": "albion_orm",
+  "name": "fw_dagger_orm",
   "version": "1.0.0",
-  "description": "node.js web freamework \"albion\" for OR-Mapping package..",
+  "description": "node.js web freamework \"fw_dagger\" for OR-Mapping package..",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Nakajima-Satoru/albion_orm.git"
+    "url": "git+https://github.com/Nakajima-Satoru/fw_dagger_orm.git"
   },
   "keywords": [
     "framework",
@@ -17,12 +17,17 @@
     "database",
     "mysql",
     "sqlite3",
-    "or-mapping"  
+    "or-mapping",
+    "fw_dagger"
   ],
   "author": "Nakajima-Satoru",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Nakajima-Satoru/albion_orm/issues"
+    "url": "https://github.com/Nakajima-Satoru/fw_dagger_orm/issues"
   },
-  "homepage": "https://github.com/Nakajima-Satoru/albion_orm#readme"
+  "homepage": "https://github.com/Nakajima-Satoru/fw_dagger_orm#readme",
+  "dependencies": {
+    "mysql":"=2.18.1",
+    "sqlite3":"=5.0.2"
+  }
 }
