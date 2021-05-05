@@ -83,7 +83,6 @@ const OrmConnection = function(conData,callback){
         _obj.connect(function(error){
         
             if(error){
-                console.log(error.stack);
                 callback({
                     status:false,
                     error:error,

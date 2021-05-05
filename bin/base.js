@@ -22,15 +22,16 @@ const OrmBase = function(context, topContext){
     
     /**
      * check
+     * @param {*} callback 
      * @returns 
      */
-    this.check=function(){
-        if(connection){
-            return true;
-        }
-        else{
-            return false;
-        }
+    this.check=function(callback){
+      
+        var connectData=context.connection();
+
+        OrmConnectionPooling.set(connectData,function(res){
+            callback(res);
+        });
     };
 
     /**
@@ -63,12 +64,24 @@ const OrmBase = function(context, topContext){
 
                 if(option.connectionPooling){
 
-                    OrmConnectionPooling.set(connectData,function(obj){
+                    OrmConnectionPooling.set(connectData,function(res){
 
-                        connection=obj;
+                        if(!res.status){
+
+                            if(ormCallback._callbackError){
+                                ormCallback._callbackError(res.error);
+                            }
+            
+                            if(ormCallback._callback){
+                                ormCallback._callback(res);
+                            }
+                            return;
+                        }
+
+                        connection=res.connection;
                         next();
 
-                    },ormCallback);
+                    });
 
                     return;
                 }

@@ -74,6 +74,7 @@ const OrmSave = function(topContent,baseObj,showObj,selectObj){
         }
 
         if(!params[surrogateKey]){
+            delete params[surrogateKey];
             return this.insert(params,option,callback);
         }
         else{

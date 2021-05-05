@@ -399,7 +399,7 @@ const OrmSelect = function(topContent,baseObj){
                             var totalPage=Math.ceil(totalCount/limit);
 
                             res.paginate={
-                                totalcount:totalCount,
+                                totalCount:totalCount,
                                 totalPage:totalPage,
                                 page:page,
                                 limit:limit,

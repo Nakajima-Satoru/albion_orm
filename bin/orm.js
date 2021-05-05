@@ -144,13 +144,14 @@ const daggerOrm=function(context){
 
     /**
      * check
+     * @param {*} callback 
      * @returns 
      */
-    this.check = function(){
+    this.check = function(callback){
         if(!_baseObj){
             _baseObj=new ormBase(this,context);
         }
-        return _baseObj.check();
+        return _baseObj.check(callback);
     };
 
     /**
