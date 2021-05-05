@@ -42,7 +42,7 @@ const OrmBase = function(context, topContext){
      * @param {*} option 
      */
     this.query=function(sql,bind,callback,option){
-
+        
         var connection = null;
 
         if(!option){

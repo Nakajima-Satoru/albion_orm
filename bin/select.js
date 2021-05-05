@@ -18,6 +18,8 @@ const OrmSelect = function(topContent,baseObj){
 
     var sqlBuilder = new OrmSqlBuilder(topContent);
 
+    var _logical_delete_mode = "normal";
+
     /**
      * select
      * @param {*} params 
@@ -129,6 +131,35 @@ const OrmSelect = function(topContent,baseObj){
         return this;
     }
 
+    /**
+     * logicaldeleteOnly
+     * @param {*} status 
+     * @returns 
+     */
+     this.logicaldeleteOnly=function(status){
+         if(status){
+            _logical_delete_mode="only";
+         }
+         else{
+            _logical_delete_mode="normal";
+         }
+        return this;
+    };
+
+    /**
+     * logicaldeleteIncludes
+     * @param {*} status 
+     * @returns 
+     */
+     this.logicaldeleteIncludes=function(status){
+        if(status){
+           _logical_delete_mode="includes";
+        }
+        else{
+           _logical_delete_mode="normal";
+        }
+       return this;
+   };
 
     /**
      * all
@@ -142,6 +173,15 @@ const OrmSelect = function(topContent,baseObj){
             type="all";
         }
         
+        if(topContent.logicalDeleteKey){
+            if(_logical_delete_mode=="normal"){
+                this.where(topContent.logicalDeleteKey.field,"=",0);
+            }
+            else if(_logical_delete_mode=="only"){
+                this.where(topContent.logicalDeleteKey.field,"=",1);
+            }
+        }
+
         if(topContent.selectBefore){
             topContent.selectBefore(this);
         }

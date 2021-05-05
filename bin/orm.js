@@ -495,7 +495,10 @@ const daggerOrm=function(context){
      * @returns 
      */
     this.transaction=function(callback,errorCallback){
-        var obj=new Ormtransaction(this);
+        if(!_baseObj){
+            _baseObj=new ormBase(this,context);
+        }
+        var obj=new Ormtransaction(_baseObj);
         if(callback){
             return obj.transam(callback,errorCallback);
         }
