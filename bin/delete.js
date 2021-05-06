@@ -108,6 +108,7 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
     this.physicalDelete = function(params,callback){
 
         var sql=this.physicalDeleteSql(params);
+console.log(sql);
 
         if(!sql){
             return;
@@ -124,6 +125,7 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
     this.physicalDeleteSql=function(params){
 
         var surrogateKey=topContext.checkSurrogateKey();
+        var logicalDeleteKey=topContext.getLogicalDeleteKey();
 
         if(surrogateKey){
             if(params){
@@ -133,6 +135,16 @@ const OrmDelete = function(topContext,baseObj,selectObj,saveObj){
                 }
     
                 this.where(surrogateKey,"IN",params);
+            }
+            else{
+                if(logicalDeleteKey){
+                    if(logicalDeleteKey.type=="integer"){
+                        this.where(logicalDeleteKey.field,"=",1);
+                    }
+                    else if(logicalDeleteKey.type=="date" || logicalDeleteKey.type=="datetime"){
+                        this.where(logicalDeleteKey.field,"IS NOT",null);
+                    }    
+                }
             }
         }
     

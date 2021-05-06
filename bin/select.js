@@ -175,10 +175,24 @@ const OrmSelect = function(topContent,baseObj){
         
         if(topContent.logicalDeleteKey){
             if(_logical_delete_mode=="normal"){
-                this.where(topContent.logicalDeleteKey.field,"=",0);
+
+                if(topContent.logicalDeleteKey.type=="integer"){
+                    this.where(topContent.logicalDeleteKey.field,"=",0);
+                }
+                else if(topContent.logicalDeleteKey.type=="date" || topContent.logicalDeleteKey.type=="datetime"){
+                    this.where(topContent.logicalDeleteKey.field,"IS",null);
+                }
+                
             }
             else if(_logical_delete_mode=="only"){
-                this.where(topContent.logicalDeleteKey.field,"=",1);
+
+                if(topContent.logicalDeleteKey.type=="integer"){
+                    this.where(topContent.logicalDeleteKey.field,"=",1);
+                }
+                else if(topContent.logicalDeleteKey.type=="date" || topContent.logicalDeleteKey.type=="datetime"){
+                    this.where(topContent.logicalDeleteKey.field,"IS NOT",null);
+                }
+
             }
         }
 
