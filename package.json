@@ -1,7 +1,7 @@
 {
-  "name": "fw_dagger_orm",
+  "name": "m02_orm",
   "version": "1.0.0",
-  "description": "node.js web freamework \"fw_dagger\" for OR-Mapping package..",
+  "description": "node.js web freamework \"m02\" for OR-Mapping package..",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,7 +18,7 @@
     "mysql",
     "sqlite3",
     "or-mapping",
-    "fw_dagger"
+    "m02"
   ],
   "author": "Nakajima-Satoru",
   "license": "MIT",

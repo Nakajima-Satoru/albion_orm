@@ -1,7 +1,7 @@
 /**
  * ==================================================
  * 
- * FW_DAGGER_ORM Ver 1.0.0
+ * m02_orm
  * 
  * connection.js (OrmConnection)
  * 
@@ -23,11 +23,20 @@ const OrmConnection = function(conData,callback){
             throw new Error("Specify either \"mysql\" or \"sqlite3\" as the type.");
         }
     
-        if(conData.type.toLowerCase()=="mysql"){
+        if(conData.type.toLowerCase() == "mysql"){
             return this.connectWithMysql(conData,callback);
         }
-        else if(conData.type.toLowerCase()=="sqlite3"){
+        else if(conData.type.toLowerCase() == "sqlite3"){
             return this.connectWithSqlite3(conData,callback);
+        }
+        else if(
+            conData.type.toLowerCase() == "pgsql" || 
+            conData.type.toLowerCase() == "postgresql"
+        ){
+            return this.connectWithPgsql(conData,callback);
+        }
+        else if(conData.type.toLowerCase() == "oracle"){
+            return this.connectWithOracle(conData,callback);
         }
         else{
             throw new Error("An unsupported SQL Type is specified.(SQL Type that can be specified is \"mysql\", \"sqlite3\".)")
@@ -130,6 +139,16 @@ const OrmConnection = function(conData,callback){
      * @param {*} data 
      */
     this.connectWithPgsql = function(data){
+
+        // comming soon....!
+
+    };
+
+    /**
+     * connectWithOracle
+     * @param {*} data 
+     */
+    this.connectWithOracle = function(data){
 
         // comming soon....!
 
